@@ -174,6 +174,18 @@
 
       <div class="h-6 w-px bg-workbench-border mx-1"></div>
 
+      <!-- Copy & Paste Toolbar Buttons -->
+      <div class="flex items-center space-x-1 bg-workbench-bg p-1 rounded-md border border-workbench-border">
+        <button id="btn-copy" onclick="copySelectedComponent()" class="p-1 rounded hover:bg-workbench-border text-slate-300 transition" title="Copy Selected Component (Ctrl+C)">
+          <i data-lucide="copy" class="w-4 h-4"></i>
+        </button>
+        <button id="btn-paste" onclick="pasteComponent()" class="p-1 rounded hover:bg-workbench-border text-slate-300 transition" title="Paste Component (Ctrl+V)">
+          <i data-lucide="clipboard-paste" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="h-6 w-px bg-workbench-border mx-1"></div>
+
       <!-- Wire Color Palette Picker -->
       <div class="flex items-center space-x-1.5 bg-workbench-bg px-2.5 py-1 rounded-md border border-workbench-border" title="Select active wire trace color">
         <span class="text-[11px] text-slate-400 font-mono mr-1">Color:</span>
@@ -293,7 +305,7 @@
       <div class="p-4 bg-workbench-panelHeader border-b border-workbench-border flex items-center justify-between">
         <div class="flex items-center space-x-3 flex-1 mr-4">
           <i data-lucide="search" class="w-5 h-5 text-slate-400"></i>
-          <input type="text" id="part-search-input" oninput="filterPartCatalog()" placeholder="Search components (Wemos D1 Mini, Oscilloscope, Resistors, Bluepill, Nucleo)..." class="w-full bg-workbench-bg border border-workbench-border rounded-lg px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500">
+          <input type="text" id="part-search-input" oninput="filterPartCatalog()" placeholder="Search components (Wemos D1 Mini, Pushbutton, Oscilloscope, Resistors, Bluepill)..." class="w-full bg-workbench-bg border border-workbench-border rounded-lg px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500">
         </div>
         <button onclick="closePartModal()" class="p-1.5 rounded-lg hover:bg-workbench-border text-slate-400 hover:text-slate-100">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -305,7 +317,7 @@
         <button onclick="setCategoryFilter('mcu')" class="cat-pill px-3 py-1 rounded-full bg-workbench-panel hover:bg-workbench-border text-slate-300">Microcontrollers</button>
         <button onclick="setCategoryFilter('instrument')" class="cat-pill px-3 py-1 rounded-full bg-workbench-panel hover:bg-workbench-border text-slate-300">Instruments</button>
         <button onclick="setCategoryFilter('sensor')" class="cat-pill px-3 py-1 rounded-full bg-workbench-panel hover:bg-workbench-border text-slate-300">Sensors & Display</button>
-        <button onclick="setCategoryFilter('discrete')" class="cat-pill px-3 py-1 rounded-full bg-workbench-panel hover:bg-workbench-border text-slate-300">Resistors & LEDs</button>
+        <button onclick="setCategoryFilter('discrete')" class="cat-pill px-3 py-1 rounded-full bg-workbench-panel hover:bg-workbench-border text-slate-300">Switches & Passives</button>
       </div>
 
       <div class="flex-1 overflow-y-auto p-4 grid grid-cols-1 sm:grid-cols-2 gap-3" id="part-catalog-grid"></div>
@@ -326,7 +338,6 @@
       { id: 'purple', hex: '#a855f7', name: 'Control' }
     ];
 
-    // Nucleo Definition Generator with perfect pin alignment and zero label overlap
     function createNucleoDefinition(id, name, partNumber, freqText) {
       const w = 380;
       const h = 470;
@@ -379,7 +390,6 @@
         pins,
         renderSVG: () => `
           <g>
-            <!-- White/Gray FR-4 Base Board -->
             <rect x="0" y="0" width="${w}" height="${h}" rx="14" fill="#eef0f3" stroke="#94a3b8" stroke-width="2"/>
             
             <!-- ST-LINK USB Header -->
@@ -396,46 +406,42 @@
             <text x="${w/2}" y="120" font-family="'Inter', sans-serif" font-size="12" fill="#1e293b" font-weight="bold" text-anchor="middle" letter-spacing="1">${name.toUpperCase()}</text>
             <text x="${w/2}" y="134" font-family="'JetBrains Mono', monospace" font-size="7" fill="#64748b" text-anchor="middle">${partNumber} ${freqText}</text>
             
-            <!-- B1 User (Blue) and B2 Reset (Black) Buttons -->
+            <!-- Buttons -->
             <circle cx="110" cy="165" r="9" fill="#2563eb"/>
             <text x="110" y="184" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#1e293b" text-anchor="middle">B1 USER</text>
             <circle cx="270" cy="165" r="9" fill="#1e293b"/>
             <text x="270" y="184" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#1e293b" text-anchor="middle">B2 RESET</text>
             
-            <!-- Central STM32 MCU Chip -->
+            <!-- STM32 Chip -->
             <g transform="translate(${w/2 - 35}, 225)">
               <rect x="0" y="0" width="70" height="70" rx="4" fill="#181d24" stroke="#334155" stroke-width="1.5"/>
               <text x="35" y="32" font-family="'Inter', sans-serif" font-size="8.5" fill="#f8fafc" font-weight="bold" text-anchor="middle">STM32</text>
               <text x="35" y="46" font-family="'JetBrains Mono', monospace" font-size="6.5" fill="#38bdf8" text-anchor="middle">${partNumber.replace('STM32', '')}</text>
             </g>
 
-            <!-- Black Plastic Header Housings -->
-            <!-- CN7 Housing -->
+            <!-- Plastic Header Housings -->
             <rect x="10" y="150" width="28" height="295" rx="2" fill="#181a20" stroke="#334155"/>
             <text x="24" y="145" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#64748b" text-anchor="middle">CN7</text>
             
-            <!-- CN10 Housing -->
             <rect x="342" y="150" width="28" height="295" rx="2" fill="#181a20" stroke="#334155"/>
             <text x="356" y="145" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#64748b" text-anchor="middle">CN10</text>
             
-            <!-- CN6 (Power) & CN8 (Analog) Housings -->
             <rect x="54" y="165" width="14" height="135" rx="2" fill="#181a20" stroke="#334155"/>
             <text x="61" y="158" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#0369a1" text-anchor="middle">PWR</text>
             <rect x="54" y="310" width="14" height="105" rx="2" fill="#181a20" stroke="#334155"/>
             <text x="61" y="305" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#0369a1" text-anchor="middle">ANALOG</text>
 
-            <!-- CN5 & CN9 (Digital) Housings -->
             <rect x="312" y="150" width="14" height="158" rx="2" fill="#181a20" stroke="#334155"/>
             <text x="319" y="144" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#0369a1" text-anchor="middle">DIGITAL</text>
             <rect x="312" y="317" width="14" height="128" rx="2" fill="#181a20" stroke="#334155"/>
 
-            <!-- Draw square golden pin socket pads inside each header housing -->
+            <!-- Draw square golden pin socket pads -->
             ${pins.map(p => `
               <rect x="${p.x - 4.5}" y="${p.y - 4.5}" width="9" height="9" fill="#ca8a04" stroke="#000000" stroke-width="0.8" rx="1"/>
               <rect x="${p.x - 2}" y="${p.y - 2}" width="4" height="4" fill="#000000" rx="0.5"/>
             `).join('')}
 
-            <!-- Silkscreen Labels with perfect vertical alignment (dominant-baseline="central") -->
+            <!-- Labels aligned to pins -->
             ${leftPwr.map((lbl, i) => `
               <text x="74" y="${175 + i * 16}" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="bold" fill="#0f172a" dominant-baseline="central">${lbl}</text>
             `).join('')}
@@ -594,7 +600,45 @@
         `
       },
 
-      // 3. DIGITAL STORAGE OSCILLOSCOPE (DSO WITH PROBE & GROUND CLIP)
+      // 3. TACTILE PUSHBUTTON SWITCH (RESTORED)
+      {
+        id: 'pushbutton_tactile',
+        name: 'Tactile Pushbutton',
+        category: 'discrete',
+        partNumber: '6x6mm SPST Tactile',
+        desc: 'Momentary 4-terminal tactile switch with solder leads and raised button plunger.',
+        width: 110,
+        height: 110,
+        pins: [
+          { id: 'pb_1a', name: 'Pin 1A', label: '1A', type: 'SW', x: 16, y: 28 },
+          { id: 'pb_1b', name: 'Pin 1B', label: '1B', type: 'SW', x: 16, y: 82 },
+          { id: 'pb_2a', name: 'Pin 2A', label: '2A', type: 'SW', x: 94, y: 28 },
+          { id: 'pb_2b', name: 'Pin 2B', label: '2B', type: 'SW', x: 94, y: 82 }
+        ],
+        renderSVG: () => `
+          <g>
+            <rect x="6" y="20" width="16" height="16" rx="1" fill="#cbd5e1" stroke="#64748b"/>
+            <rect x="6" y="74" width="16" height="16" rx="1" fill="#cbd5e1" stroke="#64748b"/>
+            <rect x="88" y="20" width="16" height="16" rx="1" fill="#cbd5e1" stroke="#64748b"/>
+            <rect x="88" y="74" width="16" height="16" rx="1" fill="#cbd5e1" stroke="#64748b"/>
+            <rect x="18" y="16" width="74" height="78" rx="6" fill="#2a3040" stroke="#475569" stroke-width="2"/>
+            <rect x="22" y="20" width="66" height="70" rx="4" fill="#1e2430"/>
+            <circle cx="28" cy="26" r="2.5" fill="#94a3b8"/>
+            <circle cx="82" cy="26" r="2.5" fill="#94a3b8"/>
+            <circle cx="28" cy="84" r="2.5" fill="#94a3b8"/>
+            <circle cx="82" cy="84" r="2.5" fill="#94a3b8"/>
+            <circle cx="55" cy="55" r="20" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
+            <circle cx="55" cy="55" r="14" fill="#e2e8f0"/>
+            <circle cx="55" cy="55" r="11" fill="#f8fafc"/>
+            <text x="34" y="32" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc">1A</text>
+            <text x="34" y="86" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc">1B</text>
+            <text x="76" y="32" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc" text-anchor="end">2A</text>
+            <text x="76" y="86" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc" text-anchor="end">2B</text>
+          </g>
+        `
+      },
+
+      // 4. DIGITAL STORAGE OSCILLOSCOPE (DSO WITH PROBE & GROUND CLIP)
       {
         id: 'digital_oscilloscope',
         name: 'Digital Oscilloscope',
@@ -642,20 +686,20 @@
         `
       },
 
-      // 4. RESISTORS OF VARIOUS OHM VALUES
+      // 5. RESISTORS OF VARIOUS OHM VALUES
       createResistorDefinition('resistor_220', 220, '220Ω', '#dc2626', '#dc2626', '#78350f'),
       createResistorDefinition('resistor_330', 330, '330Ω', '#f97316', '#f97316', '#78350f'),
       createResistorDefinition('resistor_1k', 1000, '1kΩ', '#78350f', '#000000', '#dc2626'),
       createResistorDefinition('resistor_4k7', 4700, '4.7kΩ', '#facc15', '#a855f7', '#dc2626'),
       createResistorDefinition('resistor_10k', 10000, '10kΩ', '#78350f', '#000000', '#f97316'),
 
-      // 5. NUCLEO F401RE (PERFECTLY ALIGNED HEADERS & PINS)
+      // 6. NUCLEO F401RE (PERFECTLY ALIGNED HEADERS & PINS)
       createNucleoDefinition('nucleo_401re', 'Nucleo F401RE', 'STM32F401RET6', '84 MHz'),
 
-      // 6. NUCLEO F410RB (PERFECTLY ALIGNED HEADERS & PINS)
+      // 7. NUCLEO F410RB (PERFECTLY ALIGNED HEADERS & PINS)
       createNucleoDefinition('nucleo_f410rb', 'Nucleo F410RB', 'STM32F410RBT6', '100 MHz'),
 
-      // 7. AT89S52 40-PIN DIP WITH FULL PINS & SIGNALS SILKSCREEN
+      // 8. AT89S52 40-PIN DIP WITH FULL PINS & SIGNALS SILKSCREEN
       {
         id: 'at89s52',
         name: 'AT89S52 (8051 MCU)',
@@ -686,27 +730,21 @@
         })(),
         renderSVG: () => `
           <g>
-            <!-- Silver Leadframe Pins on both sides -->
             ${Array.from({length: 20}, (_, i) => `
               <rect x="2" y="${31 + i * 20}" width="20" height="8" fill="#cbd5e1" stroke="#64748b" stroke-width="0.8"/>
               <rect x="188" y="${31 + i * 20}" width="20" height="8" fill="#cbd5e1" stroke="#64748b" stroke-width="0.8"/>
             `).join('')}
 
-            <!-- Black Molded Epoxy DIP-40 Body -->
             <rect x="22" y="12" width="166" height="426" rx="4" fill="#181a20" stroke="#2e3440" stroke-width="2"/>
-            <!-- Semi-circle Notch on Pin 1 end -->
             <path d="M 90 12 A 15 15 0 0 0 120 12 Z" fill="#0c0e14"/>
-            <!-- Pin 1 Dot -->
             <circle cx="36" cy="30" r="3" fill="#3b4252"/>
 
-            <!-- Center Silkscreen -->
             <g transform="translate(105, 215)">
               <text x="0" y="0" font-family="'Inter', sans-serif" font-size="13" fill="#f8fafc" font-weight="bold" text-anchor="middle" letter-spacing="1">AT89S52</text>
               <text x="0" y="18" font-family="'JetBrains Mono', monospace" font-size="8" fill="#94a3b8" text-anchor="middle">24PU 8051</text>
               <text x="0" y="32" font-family="'JetBrains Mono', monospace" font-size="7" fill="#64748b" text-anchor="middle">ATMEL CORP</text>
             </g>
 
-            <!-- Complete Silkscreen Pin Numbers and Signals -->
             ${(() => {
               const leftSignals = [
                 "P1.0 (T2)", "P1.1 (T2EX)", "P1.2", "P1.3", "P1.4", "P1.5 (MOSI)", "P1.6 (MISO)", "P1.7 (SCK)",
@@ -718,7 +756,6 @@
                 "EA/VPP", "ALE/PROG", "PSEN", "P2.7 (A15)", "P2.6 (A14)", "P2.5 (A13)", "P2.4 (A12)", "P2.3 (A11)", "P2.2 (A10)", "P2.1 (A9)", "P2.0 (A8)"
               ];
               let s = '';
-              // Left pins (1 to 20)
               leftSignals.forEach((sig, i) => {
                 const py = 35 + i * 20;
                 s += `
@@ -726,7 +763,6 @@
                   <text x="36" y="${py}" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#f8fafc" dominant-baseline="central">${sig}</text>
                 `;
               });
-              // Right pins (40 down to 21)
               rightSignals.forEach((sig, i) => {
                 const py = 35 + i * 20;
                 s += `
@@ -740,7 +776,7 @@
         `
       },
 
-      // 8. 7-SEGMENT DISPLAY (WITH a, b, c, d, e, f, g PIN LABELS)
+      // 9. 7-SEGMENT DISPLAY (WITH a, b, c, d, e, f, g PIN LABELS)
       {
         id: 'seven_segment',
         name: '7-Segment Display',
@@ -794,7 +830,7 @@
         `
       },
 
-      // 9. BME280 ENVIRONMENTAL SENSOR
+      // 10. BME280 ENVIRONMENTAL SENSOR
       {
         id: 'bme280',
         name: 'BME280 Sensor',
@@ -829,7 +865,7 @@
         `
       },
 
-      // 10. 16x2 LCD DISPLAY
+      // 11. 16x2 LCD DISPLAY
       {
         id: 'lcd16x2',
         name: '16x2 LCD Screen',
@@ -860,7 +896,7 @@
         `
       },
 
-      // 11. 4 DIFFERENT COLOR 5MM LEDs
+      // 12. 4 DIFFERENT COLOR 5MM LEDs
       ...['red', 'green', 'blue', 'yellow'].map(color => {
         const colorConfig = {
           red: { fill: '#ef4444', border: '#b91c1c', hex: '#ef4444', name: 'Red' },
@@ -898,12 +934,14 @@
     ];
 
     /* ==========================================================================
-       2. WORKBENCH STATE ENGINE & MULTI-LEVEL UNDO / REDO
+       2. WORKBENCH STATE ENGINE, UNDO / REDO & CLIPBOARD
        ========================================================================== */
     const history = {
       past: [],
       future: []
     };
+
+    let clipboard = null; // Stores copied component footprint
 
     const state = {
       panX: 40,
@@ -921,6 +959,7 @@
       selectedEntity: null,
       components: [],
       wires: [],
+      lastMouseWorld: { x: 200, y: 200 },
       printMode: false
     };
 
@@ -995,6 +1034,64 @@
       const next = JSON.parse(history.future.pop());
       applyCircuitState(next);
       setBannerText(`Redo applied. (${history.future.length} steps ahead)`);
+    }
+
+    // COPY & PASTE FEATURE FOR ANY COMPONENT
+    function copySelectedComponent() {
+      if (!state.selectedEntity || state.selectedEntity.type !== 'component') {
+        setBannerText("Click a component first to copy it.");
+        return;
+      }
+      const comp = state.components.find(c => c.id === state.selectedEntity.id);
+      if (!comp) return;
+
+      clipboard = {
+        catalogId: comp.catalogId,
+        customName: comp.customName,
+        rotation: comp.rotation || 0,
+        sourceX: comp.x,
+        sourceY: comp.y
+      };
+      setBannerText(`Copied ${comp.customName} to clipboard! (Ctrl+V to paste)`);
+    }
+
+    function pasteComponent() {
+      if (!clipboard) {
+        setBannerText("Clipboard is empty. Select a component and press Ctrl+C first.");
+        return;
+      }
+      const cat = CATALOG.find(item => item.id === clipboard.catalogId);
+      if (!cat) return;
+
+      saveHistory();
+
+      // Paste with a clean offset from the source position or centered at cursor
+      let pasteX, pasteY;
+      if (state.lastMouseWorld && state.lastMouseWorld.x > 0 && state.lastMouseWorld.y > 0) {
+        pasteX = snap(state.lastMouseWorld.x - cat.width / 2, 10);
+        pasteY = snap(state.lastMouseWorld.y - cat.height / 2, 10);
+      } else {
+        pasteX = snap((clipboard.sourceX || 120) + 30, 10);
+        pasteY = snap((clipboard.sourceY || 120) + 30, 10);
+      }
+
+      const newComp = {
+        id: 'comp_' + Math.random().toString(36).substring(2, 9),
+        catalogId: clipboard.catalogId,
+        customName: clipboard.customName,
+        x: pasteX,
+        y: pasteY,
+        rotation: clipboard.rotation || 0
+      };
+
+      // Shift source in clipboard so multiple pastes waterfall nicely
+      clipboard.sourceX = pasteX;
+      clipboard.sourceY = pasteY;
+
+      state.components.push(newComp);
+      renderComponentDOM(newComp);
+      selectEntity('component', newComp.id);
+      setBannerText(`Pasted ${newComp.customName}.`);
     }
 
     /* ==========================================================================
@@ -1177,12 +1274,12 @@
       };
     }
 
-    // Handles terminal click allowing MULTIPLE wires to/from the exact same pin
     function handlePinClick(compId, pinId, e) {
       e.stopPropagation();
       const coords = getPinAbsoluteCoords(compId, pinId);
       if (!coords) return;
 
+      // 1. START WIRING (Allowed even if pin already has existing wires)
       if (!state.wiring) {
         state.wiring = {
           fromComp: compId,
@@ -1197,11 +1294,13 @@
         return;
       }
 
+      // 2. PREVENT CONNECTING WIRE TO ITSELF
       if (state.wiring.fromComp === compId && state.wiring.fromPin === pinId) {
         cancelWiring();
         return;
       }
 
+      // 3. COMPLETE ORTHOGONAL CONNECTION TO TARGET PIN
       saveHistory();
 
       const pts = [...state.wiring.waypoints];
@@ -1271,7 +1370,6 @@
       return [{ x: from.x, y: from.y }, mid, { x: to.x, y: to.y }];
     }
 
-    // Wires render ON TOP of board PCB bodies (z-15) and seamlessly plug into pins
     function renderWires() {
       wiresGroup.innerHTML = '';
 
@@ -1290,14 +1388,12 @@
           selectEntity('wire', wire.id);
         };
 
-        // Hit Area
         const hit = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         hit.setAttribute('d', pathData);
         hit.setAttribute('fill', 'none');
         hit.setAttribute('stroke', 'transparent');
         hit.setAttribute('stroke-width', '16');
 
-        // Drop shadow for real jumper wire feel running over boards
         const shadow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         shadow.setAttribute('d', pathData);
         shadow.setAttribute('fill', 'none');
@@ -1308,7 +1404,6 @@
         shadow.setAttribute('stroke-linejoin', 'round');
         shadow.setAttribute('pointer-events', 'none');
 
-        // Main trace
         const trace = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         trace.setAttribute('d', pathData);
         trace.setAttribute('fill', 'none');
@@ -1319,7 +1414,6 @@
         trace.setAttribute('class', `wire-main-stroke ${isSelected ? 'wire-selected' : ''}`);
         trace.setAttribute('pointer-events', 'none');
 
-        // Terminal endpoints with pointer-events: none so clicks NEVER block pins underneath!
         const p1 = points[0];
         const p2 = points[points.length - 1];
 
@@ -1353,7 +1447,6 @@
       updatePinBadges();
     }
 
-    // Visual feedback for pins carrying multiple branches
     function updatePinBadges() {
       const pinCounts = {};
       state.wires.forEach(w => {
@@ -1375,7 +1468,6 @@
       });
     }
 
-    // Canvas click handling for 90° turn anchoring
     viewportContainer.addEventListener('mousedown', (e) => {
       if (e.target.closest('.pin-terminal')) return;
 
@@ -1416,6 +1508,9 @@
     });
 
     window.addEventListener('mousemove', (e) => {
+      const mouse = screenToWorld(e.clientX, e.clientY);
+      state.lastMouseWorld = mouse;
+
       if (state.isPanning) {
         state.panX = e.clientX - state.panStart.x;
         state.panY = e.clientY - state.panStart.y;
@@ -1424,7 +1519,6 @@
       }
 
       if (state.dragHandle) {
-        const mouse = screenToWorld(e.clientX, e.clientY);
         const wire = state.wires.find(w => w.id === state.dragHandle.wireId);
         if (wire && wire.manualWaypoints && wire.manualWaypoints[state.dragHandle.index]) {
           wire.manualWaypoints[state.dragHandle.index].x = snap(mouse.x, 10);
@@ -1436,7 +1530,6 @@
       }
 
       if (state.dragComponent) {
-        const mouse = screenToWorld(e.clientX, e.clientY);
         state.dragComponent.x = snap(mouse.x - state.dragOffset.x, 10);
         state.dragComponent.y = snap(mouse.y - state.dragOffset.y, 10);
         
@@ -1457,7 +1550,6 @@
       }
 
       if (state.wiring) {
-        const mouse = screenToWorld(e.clientX, e.clientY);
         updateRubberWire(mouse);
       }
     });
@@ -1671,6 +1763,21 @@
     window.addEventListener('keydown', (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
+      // Copy: Ctrl+C or Cmd+C
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+        e.preventDefault();
+        copySelectedComponent();
+        return;
+      }
+
+      // Paste: Ctrl+V or Cmd+V
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
+        e.preventDefault();
+        pasteComponent();
+        return;
+      }
+
+      // Undo: Ctrl+Z or Cmd+Z
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
         if (e.shiftKey) {
           e.preventDefault();
@@ -1682,12 +1789,14 @@
         return;
       }
 
+      // Redo: Ctrl+Y or Cmd+Y
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
         e.preventDefault();
         redo();
         return;
       }
 
+      // Backspace undoes the last waypoint while routing
       if (e.key === 'Backspace' && state.wiring) {
         if (state.wiring.waypoints.length > 1) {
           state.wiring.waypoints.pop();
@@ -1891,7 +2000,7 @@
     }
 
     /* ==========================================================================
-       9. PRINT MODE TOGGLE & ULTRA-HD CRISP PNG EXPORT (NO WATERMARK)
+       9. PRINT MODE TOGGLE & ULTRA-HD CRISP PNG EXPORT
        ========================================================================== */
     function togglePrintMode() {
       state.printMode = !state.printMode;
@@ -1991,7 +2100,7 @@
         `;
       });
 
-      // Pure clean export: No watermark or bookmark text stamped at the bottom
+      // Clean Pure Export: No bottom watermark stamp
       svgContent += `</svg>`;
 
       const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
