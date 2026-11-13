@@ -1028,11 +1028,11 @@
         width: 240,
         height: 300,
         pins: [
-          { id: 'mot_p1', name: 'C1 (Blue)', label: 'C1', type: 'SIGNAL', x: 60, y: 284 },
-          { id: 'mot_p2', name: 'C2 (Pink)', label: 'C2', type: 'SIGNAL', x: 90, y: 284 },
+          { id: 'mot_p1', name: 'IN1 (Blue)', label: 'IN1', type: 'SIGNAL', x: 60, y: 284 },
+          { id: 'mot_p2', name: 'IN2 (Pink)', label: 'IN2', type: 'SIGNAL', x: 90, y: 284 },
           { id: 'mot_p3', name: '+5V (Red)', label: '+5V', type: 'PWR', x: 120, y: 284 },
-          { id: 'mot_p4', name: 'C3 (Orange)', label: 'C3', type: 'SIGNAL', x: 150, y: 284 },
-          { id: 'mot_p5', name: 'C4 (Yellow)', label: 'C4', type: 'SIGNAL', x: 180, y: 284 }
+          { id: 'mot_p4', name: 'IN3 (Orange)', label: 'IN3', type: 'SIGNAL', x: 150, y: 284 },
+          { id: 'mot_p5', name: 'IN4 (Yellow)', label: 'IN4', type: 'SIGNAL', x: 180, y: 284 }
         ],
         renderSVG: (comp = {}, hiddenPins = new Set()) => {
           const termLabels = [
@@ -2196,14 +2196,26 @@
           }
         });
 
+        if (state.dragWireStarts) {
+          state.dragWireStarts.forEach(wStart => {
+            const w = state.wires.find(x => x.id === wStart.id);
+            if (w && wStart.points) {
+              w.manualWaypoints = wStart.points.map(pt => ({
+                x: pt.x + dx,
+                y: pt.y + dy
+              }));
+            }
+          });
+        }
+
         renderWires();
         return;
       }
-
       if (state.wiring) {
         updateRubberWire(mouse);
       }
-    });
+    }
+    );
 
     window.addEventListener('mouseup', () => {
       if (state.isMarquee) {
@@ -2327,7 +2339,15 @@
           return { id, startX: c ? c.x : 0, startY: c ? c.y : 0 };
         });
 
+        state.dragWireStarts = state.wires
+          .filter(w => state.selectedCompIds.includes(w.from.compId) && state.selectedCompIds.includes(w.to.compId))
+          .map(w => ({
+            id: w.id,
+            points: getWireRenderPoints(w)?.map(pt => ({ ...pt })) || null
+          }));
+
         e.stopPropagation();
+
       });
 
       const svgContainer = document.createElement('div');
