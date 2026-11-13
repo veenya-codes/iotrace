@@ -68,7 +68,7 @@
       color: #0f172a !important;
     }
 
-    /* Pin Styling - Placed on Top layer so multiple connections are effortless */
+    /* Pin Styling */
     .pin-terminal {
       transition: transform 0.12s ease, filter 0.12s ease;
       cursor: crosshair;
@@ -80,13 +80,11 @@
       z-index: 99 !important;
     }
 
-    /* Visual badge for pins with multiple branch connections */
     .pin-multi-wire {
       outline: 2px solid #38bdf8;
       box-shadow: 0 0 8px #38bdf8;
     }
 
-    /* Components on canvas */
     .canvas-part {
       touch-action: none;
       cursor: grab;
@@ -101,7 +99,6 @@
       filter: drop-shadow(0 8px 30px rgba(56, 189, 248, 0.4));
     }
 
-    /* Wires layer is z-15, running OVER board artwork (z-5) and plugging into pins (z-25) */
     .wire-interactive {
       cursor: pointer;
     }
@@ -119,7 +116,6 @@
       to { stroke-dashoffset: -18; }
     }
 
-    /* Draggable Waypoint Handles */
     .wire-handle {
       cursor: move;
       transition: transform 0.1s ease, filter 0.1s ease;
@@ -156,10 +152,15 @@
 
     <!-- Center Control Toolbar -->
     <div class="flex items-center space-x-2">
-      <!-- Add Component Primary Trigger -->
       <button onclick="openPartModal()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-md text-xs font-semibold flex items-center space-x-1.5 shadow transition">
         <i data-lucide="plus" class="w-4 h-4"></i>
         <span>Add Component</span>
+      </button>
+
+      <!-- Auto-Connect Connection Block Button -->
+      <button onclick="openAutoConnectModal()" class="px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/40 rounded-md text-xs font-semibold flex items-center space-x-1.5 transition">
+        <i data-lucide="zap" class="w-4 h-4"></i>
+        <span>Auto-Connect Block</span>
       </button>
 
       <div class="h-6 w-px bg-workbench-border mx-1"></div>
@@ -248,7 +249,7 @@
     <!-- WIRING HINT TOAST (BOTTOM-CENTER) -->
     <div id="wiring-banner" class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-all duration-200 bg-slate-900/95 border border-slate-700 px-4 py-2 rounded-full text-xs font-mono text-slate-200 shadow-2xl flex items-center space-x-2">
       <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-      <span id="wiring-banner-text">Auto-saving to LocalStorage enabled. Click pin to wire. Shift+Drag to box select.</span>
+      <span id="wiring-banner-text">Use Auto-Connect Block to instantly wire canvas components. Shift+Drag to box select.</span>
     </div>
 
     <!-- MAIN INTERACTIVE CANVAS VIEWPORT -->
@@ -310,7 +311,7 @@
       <div class="p-4 bg-workbench-panelHeader border-b border-workbench-border flex items-center justify-between">
         <div class="flex items-center space-x-3 flex-1 mr-4">
           <i data-lucide="search" class="w-5 h-5 text-slate-400"></i>
-          <input type="text" id="part-search-input" oninput="filterPartCatalog()" placeholder="Search components (Matrix Keypad, Wemos, Pushbutton, Oscilloscope, Bluepill)..." class="w-full bg-workbench-bg border border-workbench-border rounded-lg px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500">
+          <input type="text" id="part-search-input" oninput="filterPartCatalog()" placeholder="Search components (28BYJ-48 Stepper Motor, Wemos, Matrix Keypad, Bluepill)..." class="w-full bg-workbench-bg border border-workbench-border rounded-lg px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500">
         </div>
         <button onclick="closePartModal()" class="p-1.5 rounded-lg hover:bg-workbench-border text-slate-400 hover:text-slate-100">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -320,12 +321,63 @@
       <div class="px-4 py-2 border-b border-workbench-border flex space-x-2 text-xs overflow-x-auto bg-workbench-bg/50">
         <button onclick="setCategoryFilter('all')" class="cat-pill active px-3 py-1 rounded-full bg-blue-600 text-white font-medium">All Hardware</button>
         <button onclick="setCategoryFilter('mcu')" class="cat-pill px-3 py-1 rounded-full bg-workbench-panel hover:bg-workbench-border text-slate-300">Microcontrollers</button>
+        <button onclick="setCategoryFilter('actuator')" class="cat-pill px-3 py-1 rounded-full bg-workbench-panel hover:bg-workbench-border text-slate-300">Motors & Actuators</button>
         <button onclick="setCategoryFilter('instrument')" class="cat-pill px-3 py-1 rounded-full bg-workbench-panel hover:bg-workbench-border text-slate-300">Instruments</button>
         <button onclick="setCategoryFilter('sensor')" class="cat-pill px-3 py-1 rounded-full bg-workbench-panel hover:bg-workbench-border text-slate-300">Sensors & Display</button>
         <button onclick="setCategoryFilter('discrete')" class="cat-pill px-3 py-1 rounded-full bg-workbench-panel hover:bg-workbench-border text-slate-300">Switches & Passives</button>
       </div>
 
       <div class="flex-1 overflow-y-auto p-4 grid grid-cols-1 sm:grid-cols-2 gap-3" id="part-catalog-grid"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: AUTO-CONNECT BLOCK -->
+  <div id="autoconnect-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden">
+    <div class="bg-workbench-panel border border-workbench-borderLight rounded-xl shadow-2xl w-full max-w-lg flex flex-col overflow-hidden font-mono">
+      <div class="p-4 bg-workbench-panelHeader border-b border-workbench-border flex items-center justify-between font-sans">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="zap" class="w-5 h-5 text-emerald-400"></i>
+          <span class="text-sm font-bold text-slate-100">Auto-Connect Block</span>
+        </div>
+        <button onclick="closeAutoConnectModal()" class="p-1.5 rounded-lg hover:bg-workbench-border text-slate-400 hover:text-slate-100">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4 text-xs">
+        <p class="text-slate-400 font-sans leading-relaxed">
+          Select any two available components currently on your working canvas, type or select their respective pin names/numbers, and press <strong class="text-slate-200">Enter</strong> to instantly route the 90° Manhattan wire between them!
+        </p>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-slate-400 uppercase mb-1">Source Component</label>
+            <select id="ac-from-comp" onchange="updateAcPins('from')" class="w-full bg-workbench-bg border border-workbench-border rounded p-2 text-slate-200 text-xs focus:outline-none focus:border-blue-500"></select>
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-400 uppercase mb-1">Source Pin</label>
+            <select id="ac-from-pin" class="w-full bg-workbench-bg border border-workbench-border rounded p-2 text-slate-200 text-xs focus:outline-none focus:border-blue-500"></select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-slate-400 uppercase mb-1">Destination Component</label>
+            <select id="ac-to-comp" onchange="updateAcPins('to')" class="w-full bg-workbench-bg border border-workbench-border rounded p-2 text-slate-200 text-xs focus:outline-none focus:border-blue-500"></select>
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-400 uppercase mb-1">Destination Pin</label>
+            <select id="ac-to-pin" class="w-full bg-workbench-bg border border-workbench-border rounded p-2 text-slate-200 text-xs focus:outline-none focus:border-blue-500"></select>
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end space-x-2 font-sans">
+          <button onclick="closeAutoConnectModal()" class="px-4 py-2 rounded bg-workbench-bg hover:bg-workbench-border text-slate-300 text-xs">Cancel</button>
+          <button onclick="executeAutoConnect()" class="px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center space-x-1.5">
+            <span>Connect Wire (Enter)</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -503,7 +555,7 @@
             </g>
             <circle cx="65" cy="330" r="7" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
             <circle cx="65" cy="330" r="4" fill="#ffffff"/>
-            <text x="65" y="346" font-family="'JetBrains Mono', monospace" font-size="6.5" fill="#cbd5e1" text-anchor="middle">RESET</text>
+            <text x="65" y="346" font-family="'JetBrains Mono', monospace" font-size="6" fill="#cbd5e1" text-anchor="middle">RESET</text>
             <g transform="translate(95, 324)">
               <rect x="0" y="0" width="34" height="10" rx="1" fill="#ca8a04"/>
               <text x="17" y="22" font-family="'JetBrains Mono', monospace" font-size="6.5" fill="#cbd5e1" text-anchor="middle">SWD</text>
@@ -574,7 +626,55 @@
         `
       },
 
-      // 3. TACTILE PUSHBUTTON SWITCH
+      // 3. STEPPER MOTOR 28BYJ-48 (WITH ATTACHED REFERENCE PINOUT 1-5 & COIL LABELS)
+      {
+        id: 'stepper_28byj48',
+        name: '28BYJ-48 Stepper Motor',
+        category: 'actuator',
+        partNumber: '28BYJ-48 5V Stepper',
+        desc: '5-wire unipolar stepper motor with 5-pin connector harness (Coil 4, Coil 2, 5V, Coil 1, Coil 3).',
+        width: 240,
+        height: 320,
+        pins: [
+          { id: 'mot_p1', name: 'Pin 1 (Coil 4 - Blue)', label: 'Coil 4', type: 'SIGNAL', x: 74, y: 304 },
+          { id: 'mot_p2', name: 'Pin 2 (Coil 2 - Pink)', label: 'Coil 2', type: 'SIGNAL', x: 94, y: 304 },
+          { id: 'mot_p3', name: 'Pin 3 (5V - Red)', label: '5V', type: 'PWR', x: 114, y: 304 },
+          { id: 'mot_p4', name: 'Pin 4 (Coil 1 - Orange)', label: 'Coil 1', type: 'SIGNAL', x: 134, y: 304 },
+          { id: 'mot_p5', name: 'Pin 5 (Coil 3 - Yellow)', label: 'Coil 3', type: 'SIGNAL', x: 154, y: 304 }
+        ],
+        renderSVG: () => `
+          <g>
+            <!-- Motor Circular Gearbox Body -->
+            <circle cx="120" cy="90" r="75" fill="#94a3b8" stroke="#64748b" stroke-width="3"/>
+            <!-- Mounting Ears -->
+            <circle cx="40" cy="110" r="10" fill="#94a3b8" stroke="#64748b" stroke-width="2"/>
+            <circle cx="40" cy="110" r="4" fill="#0f172a"/>
+            <circle cx="200" cy="110" r="10" fill="#94a3b8" stroke="#64748b" stroke-width="2"/>
+            <circle cx="200" cy="110" r="4" fill="#0f172a"/>
+
+            <!-- Center Shaft Bearing -->
+            <circle cx="120" cy="70" r="26" fill="#cbd5e1" stroke="#64748b" stroke-width="2"/>
+            <circle cx="120" cy="70" r="14" fill="#fbbf24" stroke="#d97706" stroke-width="1.5"/>
+            <circle cx="120" cy="70" r="2" fill="#0f172a"/>
+
+            <!-- Lower Plastic Housing -->
+            <rect x="85" y="150" width="70" height="35" rx="4" fill="#38bdf8" stroke="#0284c7" stroke-width="2"/>
+
+            <!-- 5 Colored Harness Wires (Blue, Pink, Red, Orange, Yellow) -->
+            <path d="M 90 185 L 74 304" stroke="#3b82f6" stroke-width="5" stroke-linecap="round"/>
+            <path d="M 102 185 L 94 304" stroke="#ec4899" stroke-width="5" stroke-linecap="round"/>
+            <path d="M 120 185 L 114 304" stroke="#ef4444" stroke-width="5" stroke-linecap="round"/>
+            <path d="M 138 185 L 134 304" stroke="#f97316" stroke-width="5" stroke-linecap="round"/>
+            <path d="M 150 185 L 154 304" stroke="#eab308" stroke-width="5" stroke-linecap="round"/>
+
+            <!-- Pin labels (1 to 5 with coil colors matching reference pinout) -->
+            <text x="120" y="240" font-family="'Inter', sans-serif" font-size="10" fill="#ffffff" font-weight="bold" text-anchor="middle">28BYJ-48</text>
+            <text x="120" y="255" font-family="'JetBrains Mono', monospace" font-size="7.5" fill="#e2e8f0" text-anchor="middle">1:C4 | 2:C2 | 3:5V | 4:C1 | 5:C3</text>
+          </g>
+        `
+      },
+
+      // 4. TACTILE PUSHBUTTON SWITCH
       {
         id: 'pushbutton_tactile',
         name: 'Tactile Pushbutton',
@@ -608,64 +708,6 @@
             <text x="34" y="86" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc">1B</text>
             <text x="76" y="32" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc" text-anchor="end">2A</text>
             <text x="76" y="86" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc" text-anchor="end">2B</text>
-          </g>
-        `
-      },
-
-      // 4. 4X4 KEYPAD MATRIX (BASED ON ATTACHED SCHEMATIC REFERENCE)
-      {
-        id: 'matrix_keypad_4x4',
-        name: '4x4 Matrix Keypad',
-        category: 'interface',
-        partNumber: '4x4 Matrix (R1-R4, C1-C4)',
-        desc: '16-button matrix keypad with 8 shared row and column lines (R1-R4, C1-C4).',
-        width: 260,
-        height: 290,
-        pins: [
-          // Row outputs along top/side: R1, R2, R3, R4
-          { id: 'kp_r1', name: 'Row 1 (R1)', label: 'R1', type: 'SIGNAL', x: 220, y: 35 },
-          { id: 'kp_r2', name: 'Row 2 (R2)', label: 'R2', type: 'SIGNAL', x: 220, y: 80 },
-          { id: 'kp_r3', name: 'Row 3 (R3)', label: 'R3', type: 'SIGNAL', x: 220, y: 125 },
-          { id: 'kp_r4', name: 'Row 4 (R4)', label: 'R4', type: 'SIGNAL', x: 220, y: 170 },
-          // Column outputs along bottom: C1, C2, C3, C4
-          { id: 'kp_c1', name: 'Col 1 (C1)', label: 'C1', type: 'SIGNAL', x: 35, y: 272 },
-          { id: 'kp_c2', name: 'Col 2 (C2)', label: 'C2', type: 'SIGNAL', x: 75, y: 272 },
-          { id: 'kp_c3', name: 'Col 3 (C3)', label: 'C3', type: 'SIGNAL', x: 115, y: 272 },
-          { id: 'kp_c4', name: 'Col 4 (C4)', label: 'C4', type: 'SIGNAL', x: 155, y: 272 }
-        ],
-        renderSVG: () => `
-          <g>
-            <!-- Keypad Housing -->
-            <rect x="15" y="15" width="230" height="245" rx="10" fill="#181a20" stroke="#334155" stroke-width="2"/>
-            
-            <!-- 16 Key Buttons (4x4 Matrix) -->
-            ${[
-              ['1','2','3','A'],
-              ['4','5','6','B'],
-              ['7','8','9','C'],
-              ['*','0','#','D']
-            ].flatMap((row, rIdx) => 
-              row.map((key, cIdx) => `
-                <g transform="translate(${25 + cIdx * 45}, ${25 + rIdx * 45})">
-                  <rect width="36" height="36" rx="6" fill="#2a3040" stroke="#475569" stroke-width="1.5"/>
-                  <text x="18" y="23" font-family="'Inter', sans-serif" font-size="14" fill="${['A','B','C','D'].includes(key) ? '#f87171' : '#f8fafc'}" font-weight="bold" text-anchor="middle">${key}</text>
-                </g>
-              `)
-            ).join('')}
-
-            <!-- Row Output Pin Nodes (R1-R4) -->
-            ${[35, 80, 125, 170].map((y, i) => `
-              <line x1="205" y1="${y}" x2="220" y2="${y}" stroke="#cbd5e1" stroke-width="2"/>
-              <text x="195" y="${y + 3}" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="bold" fill="#38bdf8" text-anchor="end">R${i+1}</text>
-            `).join('')}
-
-            <!-- Column Output Pin Nodes (C1-C4) -->
-            ${[35, 75, 115, 155].map((x, i) => `
-              <line x1="${x}" y1="205" x2="${x}" y2="272" stroke="#cbd5e1" stroke-width="2"/>
-              <text x="${x}" y="200" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="bold" fill="#f87171" text-anchor="middle">C${i+1}</text>
-            `).join('')}
-
-            <text x="130" y="240" font-family="'JetBrains Mono', monospace" font-size="7" fill="#64748b" text-anchor="middle">4x4 MATRIX KEYPAD</text>
           </g>
         `
       },
@@ -1001,7 +1043,7 @@
       printMode: false
     };
 
-    const STORAGE_KEY = 'iotrace_circuit_autosave_v1';
+    const STORAGE_KEY = 'iotrace_circuit_autosave_v2';
 
     const viewportContainer = document.getElementById('viewport-container');
     const canvasWorld = document.getElementById('canvas-world');
@@ -1087,7 +1129,6 @@
       selectEntity(null);
       updateNetlistUI();
       updateUndoRedoButtons();
-      persistToLocalStorage();
     }
 
     function undo() {
@@ -1208,6 +1249,105 @@
       persistToLocalStorage();
       setBannerText(`Pasted ${newCompIds.length} component(s). Drag to move together.`);
     }
+
+    /* ==========================================================================
+       AUTO-CONNECT BLOCK MODAL LOGIC
+       ========================================================================== */
+    function openAutoConnectModal() {
+      if (state.components.length < 1) {
+        alert("Please add at least one component to the canvas first.");
+        return;
+      }
+      populateAutoConnectDropdowns();
+      document.getElementById('autoconnect-modal').classList.remove('hidden');
+    }
+
+    function closeAutoConnectModal() {
+      document.getElementById('autoconnect-modal').classList.add('hidden');
+    }
+
+    function populateAutoConnectDropdowns() {
+      const fromCompSel = document.getElementById('ac-from-comp');
+      const toCompSel = document.getElementById('ac-to-comp');
+      fromCompSel.innerHTML = '';
+      toCompSel.innerHTML = '';
+
+      state.components.forEach(c => {
+        const cat = CATALOG.find(item => item.id === c.catalogId);
+        const name = `${c.customName} (${c.id.substring(0,5)})`;
+        fromCompSel.add(new Option(name, c.id));
+        toCompSel.add(new Option(name, c.id));
+      });
+
+      if (state.components.length > 1) {
+        toCompSel.selectedIndex = 1;
+      }
+      updateAcPins('from');
+      updateAcPins('to');
+    }
+
+    function updateAcPins(which) {
+      const compId = document.getElementById(`ac-${which}-comp`).value;
+      const pinSel = document.getElementById(`ac-${which}-pin`);
+      pinSel.innerHTML = '';
+
+      const comp = state.components.find(c => c.id === compId);
+      if (!comp) return;
+      const cat = CATALOG.find(item => item.id === comp.catalogId);
+      if (!cat) return;
+
+      cat.pins.forEach(p => {
+        pinSel.add(new Option(`${p.name} (${p.type})`, p.id));
+      });
+    }
+
+    function executeAutoConnect() {
+      const fromCompId = document.getElementById('ac-from-comp').value;
+      const fromPinId = document.getElementById('ac-from-pin').value;
+      const toCompId = document.getElementById('ac-to-comp').value;
+      const toPinId = document.getElementById('ac-to-pin').value;
+
+      if (!fromCompId || !fromPinId || !toCompId || !toPinId) {
+        alert("Please select valid components and pins.");
+        return;
+      }
+
+      if (fromCompId === toCompId && fromPinId === toPinId) {
+        alert("Cannot connect a pin to itself.");
+        return;
+      }
+
+      saveHistory();
+
+      const fromCoord = getPinAbsoluteCoords(fromCompId, fromPinId);
+      const toCoord = getPinAbsoluteCoords(toCompId, toPinId);
+
+      const dx = Math.abs(toCoord.x - fromCoord.x);
+      const dy = Math.abs(toCoord.y - fromCoord.y);
+      const mid = dx >= dy ? { x: toCoord.x, y: fromCoord.y } : { x: fromCoord.x, y: toCoord.y };
+      const waypoints = [{ x: fromCoord.x, y: fromCoord.y }, mid, { x: toCoord.x, y: toCoord.y }];
+
+      state.wires.push({
+        id: 'wire_' + Date.now(),
+        from: { compId: fromCompId, pinId: fromPinId },
+        to: { compId: toCompId, pinId: toPinId },
+        color: state.activeWireColor,
+        manualWaypoints: waypoints
+      });
+
+      renderWires();
+      updatePinBadges();
+      updateNetlistUI();
+      closeAutoConnectModal();
+      setBannerText("Auto-Connect wire successfully routed!");
+    }
+
+    // Enter key listener for Auto-Connect modal
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !document.getElementById('autoconnect-modal').classList.contains('hidden')) {
+        executeAutoConnect();
+      }
+    });
 
     /* ==========================================================================
        3. CANVAS MECHANICS (PAN, ZOOM, GRID SNAP)
@@ -1449,7 +1589,7 @@
       updateNetlistUI();
       selectEntity('wire', newWire.id);
       setBannerText(`Wire connected! Multiple traces to same pin active.`);
-      setTimeout(() => setBannerText('Shift+Click or Shift+Drag to multi-select. Drag group to move together.'), 2500);
+      setTimeout(() => setBannerText('Click pin to wire. Multiple wires per pin allowed. Click canvas or drag to turn 90°.'), 2500);
     }
 
     function cancelWiring() {
@@ -1457,7 +1597,7 @@
       rubberWire.classList.add('hidden');
       rubberWire.setAttribute('d', '');
       waypointMarkers.innerHTML = '';
-      setBannerText('Shift+Click or Shift+Drag to multi-select. Drag group to move together.');
+      setBannerText('Click pin to wire. Multiple wires per pin allowed. Click canvas or drag to turn 90°.');
     }
 
     function setBannerText(text) {
@@ -1557,7 +1697,6 @@
 
       wireCountBadge.textContent = state.wires.length;
       updatePinBadges();
-      persistToLocalStorage();
     }
 
     function updatePinBadges() {
@@ -2399,79 +2538,30 @@
         return;
       }
 
-      // Default demo setup: Wemos + Bluepill + LED + Resistor
-      spawnComponent('wemos_d1_mini', 100, 240);
+      // Default demo setup: Wemos + Bluepill + Stepper Motor + Keypad
+      spawnComponent('wemos_d1_mini', 60, 240);
       const wemos = state.components[0];
 
-      spawnComponent('stm32_bluepill', 440, 80);
+      spawnComponent('stm32_bluepill', 320, 80);
       const bluepill = state.components[1];
 
-      spawnComponent('led_red', 60, 80);
-      const led = state.components[2];
+      spawnComponent('stepper_28byj48', 540, 100);
+      const stepper = state.components[2];
 
-      spawnComponent('resistor_1k', 220, 130);
-      const resistor = state.components[3];
+      spawnComponent('matrix_keypad_4x4', 520, 450);
 
-      const pBlue3v3 = getPinAbsoluteCoords(bluepill.id, 'bp_r_2');
-      const pLedAnode = getPinAbsoluteCoords(led.id, 'anode');
-      state.wires.push({
-        id: 'w1',
-        from: { compId: bluepill.id, pinId: 'bp_r_2' },
-        to: { compId: led.id, pinId: 'anode' },
-        color: 'red',
-        manualWaypoints: [
-          { x: pBlue3v3.x, y: pBlue3v3.y },
-          { x: pBlue3v3.x + 30, y: pBlue3v3.y },
-          { x: pBlue3v3.x + 30, y: 30 },
-          { x: 26, y: 30 },
-          { x: 26, y: pLedAnode.y + 15 },
-          { x: pLedAnode.x, y: pLedAnode.y + 15 },
-          { x: pLedAnode.x, y: pLedAnode.y }
-        ]
-      });
-
-      const pLedCathode = getPinAbsoluteCoords(led.id, 'cathode');
-      const pResLead1 = getPinAbsoluteCoords(resistor.id, 'r_p1');
-      state.wires.push({
-        id: 'w2',
-        from: { compId: led.id, pinId: 'cathode' },
-        to: { compId: resistor.id, pinId: 'r_p1' },
-        color: 'green',
-        manualWaypoints: [
-          { x: pLedCathode.x, y: pLedCathode.y },
-          { x: pLedCathode.x, y: pLedCathode.y + 20 },
-          { x: 180, y: pLedCathode.y + 20 },
-          { x: 180, y: pResLead1.y },
-          { x: pResLead1.x, y: pResLead1.y }
-        ]
-      });
-
-      const pResLead2 = getPinAbsoluteCoords(resistor.id, 'r_p2');
-      const pBlueC13 = getPinAbsoluteCoords(bluepill.id, 'bp_l_1');
-      state.wires.push({
-        id: 'w3',
-        from: { compId: resistor.id, pinId: 'r_p2' },
-        to: { compId: bluepill.id, pinId: 'bp_l_1' },
-        color: 'green',
-        manualWaypoints: [
-          { x: pResLead2.x, y: pResLead2.y },
-          { x: 370, y: pResLead2.y },
-          { x: 370, y: pBlueC13.y },
-          { x: pBlueC13.x, y: pBlueC13.y }
-        ]
-      });
-
+      // Wire: Wemos D3 -> Bluepill ~B0
       const pWemosD3 = getPinAbsoluteCoords(wemos.id, 'wm_r_4');
       const pBlueB0 = getPinAbsoluteCoords(bluepill.id, 'bp_l_12');
       state.wires.push({
-        id: 'w4',
+        id: 'w1',
         from: { compId: wemos.id, pinId: 'wm_r_4' },
         to: { compId: bluepill.id, pinId: 'bp_l_12' },
         color: 'orange',
         manualWaypoints: [
           { x: pWemosD3.x, y: pWemosD3.y },
-          { x: 370, y: pWemosD3.y },
-          { x: 370, y: pBlueB0.y },
+          { x: 260, y: pWemosD3.y },
+          { x: 260, y: pBlueB0.y },
           { x: pBlueB0.x, y: pBlueB0.y }
         ]
       });
