@@ -249,7 +249,7 @@
     <!-- WIRING HINT TOAST (BOTTOM-CENTER) -->
     <div id="wiring-banner" class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-all duration-200 bg-slate-900/95 border border-slate-700 px-4 py-2 rounded-full text-xs font-mono text-slate-200 shadow-2xl flex items-center space-x-2">
       <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-      <span id="wiring-banner-text">Use Auto-Connect Block to instantly wire canvas components. Shift+Drag to box select.</span>
+      <span id="wiring-banner-text">Use Auto-Connect Block for clean 90° Manhattan automatic routing. Shift+Drag to box select.</span>
     </div>
 
     <!-- MAIN INTERACTIVE CANVAS VIEWPORT -->
@@ -331,13 +331,13 @@
     </div>
   </div>
 
-  <!-- MODAL: AUTO-CONNECT BLOCK -->
+  <!-- MODAL: AUTO-CONNECT BLOCK (WITH 90° MANHATTAN ROUTING) -->
   <div id="autoconnect-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden">
     <div class="bg-workbench-panel border border-workbench-borderLight rounded-xl shadow-2xl w-full max-w-lg flex flex-col overflow-hidden font-mono">
       <div class="p-4 bg-workbench-panelHeader border-b border-workbench-border flex items-center justify-between font-sans">
         <div class="flex items-center space-x-2">
           <i data-lucide="zap" class="w-5 h-5 text-emerald-400"></i>
-          <span class="text-sm font-bold text-slate-100">Auto-Connect Block</span>
+          <span class="text-sm font-bold text-slate-100">Auto-Connect Block (90° Manhattan)</span>
         </div>
         <button onclick="closeAutoConnectModal()" class="p-1.5 rounded-lg hover:bg-workbench-border text-slate-400 hover:text-slate-100">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -346,7 +346,7 @@
 
       <div class="p-5 space-y-4 text-xs">
         <p class="text-slate-400 font-sans leading-relaxed">
-          Select any two available components currently on your working canvas, type or select their respective pin names/numbers, and press <strong class="text-slate-200">Enter</strong> to instantly route the 90° Manhattan wire between them!
+          Select any two available components currently on your working canvas, choose their respective pin numbers, and press <strong class="text-slate-200">Enter</strong> to instantly route a clean 90-degree orthogonal Manhattan wire between them!
         </p>
 
         <div class="grid grid-cols-2 gap-3">
@@ -626,7 +626,7 @@
         `
       },
 
-      // 3. STEPPER MOTOR 28BYJ-48 (WITH ATTACHED REFERENCE PINOUT 1-5 & COIL LABELS)
+      // 3. STEPPER MOTOR 28BYJ-48 (BASED ON ATTACHED REFERENCE PINOUT)
       {
         id: 'stepper_28byj48',
         name: '28BYJ-48 Stepper Motor',
@@ -644,30 +644,20 @@
         ],
         renderSVG: () => `
           <g>
-            <!-- Motor Circular Gearbox Body -->
             <circle cx="120" cy="90" r="75" fill="#94a3b8" stroke="#64748b" stroke-width="3"/>
-            <!-- Mounting Ears -->
             <circle cx="40" cy="110" r="10" fill="#94a3b8" stroke="#64748b" stroke-width="2"/>
             <circle cx="40" cy="110" r="4" fill="#0f172a"/>
             <circle cx="200" cy="110" r="10" fill="#94a3b8" stroke="#64748b" stroke-width="2"/>
             <circle cx="200" cy="110" r="4" fill="#0f172a"/>
-
-            <!-- Center Shaft Bearing -->
             <circle cx="120" cy="70" r="26" fill="#cbd5e1" stroke="#64748b" stroke-width="2"/>
             <circle cx="120" cy="70" r="14" fill="#fbbf24" stroke="#d97706" stroke-width="1.5"/>
             <circle cx="120" cy="70" r="2" fill="#0f172a"/>
-
-            <!-- Lower Plastic Housing -->
             <rect x="85" y="150" width="70" height="35" rx="4" fill="#38bdf8" stroke="#0284c7" stroke-width="2"/>
-
-            <!-- 5 Colored Harness Wires (Blue, Pink, Red, Orange, Yellow) -->
             <path d="M 90 185 L 74 304" stroke="#3b82f6" stroke-width="5" stroke-linecap="round"/>
             <path d="M 102 185 L 94 304" stroke="#ec4899" stroke-width="5" stroke-linecap="round"/>
             <path d="M 120 185 L 114 304" stroke="#ef4444" stroke-width="5" stroke-linecap="round"/>
             <path d="M 138 185 L 134 304" stroke="#f97316" stroke-width="5" stroke-linecap="round"/>
             <path d="M 150 185 L 154 304" stroke="#eab308" stroke-width="5" stroke-linecap="round"/>
-
-            <!-- Pin labels (1 to 5 with coil colors matching reference pinout) -->
             <text x="120" y="240" font-family="'Inter', sans-serif" font-size="10" fill="#ffffff" font-weight="bold" text-anchor="middle">28BYJ-48</text>
             <text x="120" y="255" font-family="'JetBrains Mono', monospace" font-size="7.5" fill="#e2e8f0" text-anchor="middle">1:C4 | 2:C2 | 3:5V | 4:C1 | 5:C3</text>
           </g>
@@ -1043,7 +1033,7 @@
       printMode: false
     };
 
-    const STORAGE_KEY = 'iotrace_circuit_autosave_v2';
+    const STORAGE_KEY = 'iotrace_circuit_autosave_v3';
 
     const viewportContainer = document.getElementById('viewport-container');
     const canvasWorld = document.getElementById('canvas-world');
@@ -1251,7 +1241,7 @@
     }
 
     /* ==========================================================================
-       AUTO-CONNECT BLOCK MODAL LOGIC
+       AUTO-CONNECT BLOCK MODAL LOGIC (WITH 90° MANHATTAN ROUTING)
        ========================================================================== */
     function openAutoConnectModal() {
       if (state.components.length < 1) {
@@ -1339,10 +1329,9 @@
       updatePinBadges();
       updateNetlistUI();
       closeAutoConnectModal();
-      setBannerText("Auto-Connect wire successfully routed!");
+      setBannerText("Auto-Connect 90° Manhattan wire successfully routed!");
     }
 
-    // Enter key listener for Auto-Connect modal
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !document.getElementById('autoconnect-modal').classList.contains('hidden')) {
         executeAutoConnect();
@@ -1697,6 +1686,7 @@
 
       wireCountBadge.textContent = state.wires.length;
       updatePinBadges();
+      persistToLocalStorage();
     }
 
     function updatePinBadges() {
@@ -2283,8 +2273,8 @@
     function copyNetlistText() {
       if (state.wires.length === 0) return;
       const lines = state.wires.map((w, idx) => {
-        const from = getPinAbsoluteCoords(w.from.compId, wire.from.pinId);
-        const to = getPinAbsoluteCoords(w.to.compId, wire.to.pinId);
+        const from = getPinAbsoluteCoords(wire.from.compId, wire.from.pinId);
+        const to = getPinAbsoluteCoords(wire.to.compId, wire.to.pinId);
         return `#${idx + 1}: ${from?.compName} [${from?.name}] ──[${w.color}]──> ${to?.compName} [${to?.name}]`;
       });
       navigator.clipboard.writeText(lines.join('\n'));
@@ -2538,7 +2528,7 @@
         return;
       }
 
-      // Default demo setup: Wemos + Bluepill + Stepper Motor + Keypad
+      // Default demo setup: Wemos + Bluepill + 28BYJ-48 Stepper Motor + Matrix Keypad
       spawnComponent('wemos_d1_mini', 60, 240);
       const wemos = state.components[0];
 
