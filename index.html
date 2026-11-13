@@ -2657,6 +2657,7 @@
       const tableHeaderHeight = 40;
       const footerHeight = 32;
 
+
       // Measure column widths dynamically
       const tempCanvas = document.createElement('canvas');
       const tCtx = tempCanvas.getContext('2d');
@@ -2698,11 +2699,11 @@
       // Title Banner
       ctx.fillStyle = textPrimary;
       ctx.font = 'bold 18px "JetBrains Mono", monospace';
-      ctx.fillText('IoTrace // WIRING INTERCONNECT NETLIST', padX, 32);
+      ctx.fillText('WIRING NETLIST', padX, 32);
 
       ctx.fillStyle = textMuted;
       ctx.font = '12px "Inter", sans-serif';
-      ctx.fillText(`Total Connections: ${rows.length}   |   Generated: ${new Date().toLocaleDateString()}`, padX, 52);
+      ctx.fillText(`Total Connections: ${rows.length}`, padX, 52);
 
       let curY = headerHeight;
 
