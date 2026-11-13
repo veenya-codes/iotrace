@@ -152,6 +152,7 @@
 
     <!-- Center Control Toolbar -->
     <div class="flex items-center space-x-2">
+      <!-- Add Component Primary Trigger -->
       <button onclick="openPartModal()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-md text-xs font-semibold flex items-center space-x-1.5 shadow transition">
         <i data-lucide="plus" class="w-4 h-4"></i>
         <span>Add Component</span>
@@ -248,7 +249,7 @@
     <!-- WIRING HINT TOAST (BOTTOM-CENTER) -->
     <div id="wiring-banner" class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none transition-all duration-200 bg-slate-900/95 border border-slate-700 px-4 py-2 rounded-full text-xs font-mono text-slate-200 shadow-2xl flex items-center space-x-2">
       <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-      <span id="wiring-banner-text">Auto-Connect Block routes cleanly out of board bounds first. Shift+Drag to box select.</span>
+      <span id="wiring-banner-text">BME280 sensor included. Click pin to wire. Shift+Drag to box select.</span>
     </div>
 
     <!-- MAIN INTERACTIVE CANVAS VIEWPORT -->
@@ -310,7 +311,7 @@
       <div class="p-4 bg-workbench-panelHeader border-b border-workbench-border flex items-center justify-between">
         <div class="flex items-center space-x-3 flex-1 mr-4">
           <i data-lucide="search" class="w-5 h-5 text-slate-400"></i>
-          <input type="text" id="part-search-input" oninput="filterPartCatalog()" placeholder="Search components (STM32 Bluepill, Nucleo F401RE, 28BYJ-48 Stepper, AT89S52, LCD)..." class="w-full bg-workbench-bg border border-workbench-border rounded-lg px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500">
+          <input type="text" id="part-search-input" oninput="filterPartCatalog()" placeholder="Search components (BME280 Sensor, Wemos D1 Mini, Stepper Motor, LCD, Keypad)..." class="w-full bg-workbench-bg border border-workbench-border rounded-lg px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500">
         </div>
         <button onclick="closePartModal()" class="p-1.5 rounded-lg hover:bg-workbench-border text-slate-400 hover:text-slate-100">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -318,7 +319,7 @@
       </div>
 
       <div class="px-4 py-2 border-b border-workbench-border flex space-x-2 text-xs overflow-x-auto bg-workbench-bg/50">
-        <button onclick="setCategoryFilter('all')" class="cat-pill active px-3 py-1 rounded-full bg-blue-600 text-white font-medium">All Hardware (16)</button>
+        <button onclick="setCategoryFilter('all')" class="cat-pill active px-3 py-1 rounded-full bg-blue-600 text-white font-medium">All Hardware (17)</button>
         <button onclick="setCategoryFilter('mcu')" class="cat-pill px-3 py-1 rounded-full bg-workbench-panel hover:bg-workbench-border text-slate-300">Microcontrollers</button>
         <button onclick="setCategoryFilter('actuator')" class="cat-pill px-3 py-1 rounded-full bg-workbench-panel hover:bg-workbench-border text-slate-300">Motors & Actuators</button>
         <button onclick="setCategoryFilter('instrument')" class="cat-pill px-3 py-1 rounded-full bg-workbench-panel hover:bg-workbench-border text-slate-300">Instruments</button>
@@ -382,7 +383,7 @@
 
   <script>
     /* ==========================================================================
-       1. HARDWARE COMPONENT DEFINITIONS (ALL 16 REQUESTED PARTS INCLUDED)
+       1. HARDWARE COMPONENT DEFINITIONS WITH AUTHENTIC PINOUTS
        ========================================================================== */
     const WIRE_PALETTE = [
       { id: 'red', hex: '#ef4444', name: 'Power (+5V / +3.3V)' },
@@ -515,7 +516,7 @@
     }
 
     const CATALOG = [
-      // 1. STM32 BLUEPILL (#1)
+      // 1. STM32 BLUEPILL
       {
         id: 'stm32_bluepill',
         name: 'STM32 Blue Pill',
@@ -575,13 +576,7 @@
         `
       },
 
-      // 2. NUCLEO F401RE (#2)
-      createNucleoDefinition('nucleo_401re', 'Nucleo F401RE', 'STM32F401RET6', '84 MHz'),
-
-      // 3. NUCLEO F410RB (#3)
-      createNucleoDefinition('nucleo_f410rb', 'Nucleo F410RB', 'STM32F410RBT6', '100 MHz'),
-
-      // 4. WEMOS ESP8266 D1 MINI (#4)
+      // 2. WEMOS D1 MINI
       {
         id: 'wemos_d1_mini',
         name: 'Wemos D1 Mini (ESP8266)',
@@ -631,7 +626,131 @@
         `
       },
 
-      // 5. USB TO TTL CONVERTER (FTDI) (#5)
+      // 3. TACTILE PUSHBUTTON SWITCH
+      {
+        id: 'pushbutton_tactile',
+        name: 'Tactile Pushbutton',
+        category: 'discrete',
+        partNumber: '6x6mm SPST Tactile',
+        desc: 'Momentary 4-terminal tactile switch with solder leads and raised button plunger.',
+        width: 110,
+        height: 110,
+        pins: [
+          { id: 'pb_1a', name: 'Pin 1A', label: '1A', type: 'SW', x: 16, y: 28 },
+          { id: 'pb_1b', name: 'Pin 1B', label: '1B', type: 'SW', x: 16, y: 82 },
+          { id: 'pb_2a', name: 'Pin 2A', label: '2A', type: 'SW', x: 94, y: 28 },
+          { id: 'pb_2b', name: 'Pin 2B', label: '2B', type: 'SW', x: 94, y: 82 }
+        ],
+        renderSVG: () => `
+          <g>
+            <rect x="6" y="20" width="16" height="16" rx="1" fill="#cbd5e1" stroke="#64748b"/>
+            <rect x="6" y="74" width="16" height="16" rx="1" fill="#cbd5e1" stroke="#64748b"/>
+            <rect x="88" y="20" width="16" height="16" rx="1" fill="#cbd5e1" stroke="#64748b"/>
+            <rect x="88" y="74" width="16" height="16" rx="1" fill="#cbd5e1" stroke="#64748b"/>
+            <rect x="18" y="16" width="74" height="78" rx="6" fill="#2a3040" stroke="#475569" stroke-width="2"/>
+            <rect x="22" y="20" width="66" height="70" rx="4" fill="#1e2430"/>
+            <circle cx="28" cy="26" r="2.5" fill="#94a3b8"/>
+            <circle cx="82" cy="26" r="2.5" fill="#94a3b8"/>
+            <circle cx="28" cy="84" r="2.5" fill="#94a3b8"/>
+            <circle cx="82" cy="84" r="2.5" fill="#94a3b8"/>
+            <circle cx="55" cy="55" r="20" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
+            <circle cx="55" cy="55" r="14" fill="#e2e8f0"/>
+            <circle cx="55" cy="55" r="11" fill="#f8fafc"/>
+            <text x="34" y="32" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc">1A</text>
+            <text x="34" y="86" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc">1B</text>
+            <text x="76" y="32" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc" text-anchor="end">2A</text>
+            <text x="76" y="86" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc" text-anchor="end">2B</text>
+          </g>
+        `
+      },
+
+      // 4. STEPPER MOTOR 28BYJ-48
+      {
+        id: 'stepper_28byj48',
+        name: '28BYJ-48 Stepper Motor',
+        category: 'actuator',
+        partNumber: '28BYJ-48 5V Stepper',
+        desc: '5-wire unipolar stepper motor with 5-pin connector harness (Coil 4, Coil 2, 5V, Coil 1, Coil 3).',
+        width: 240,
+        height: 320,
+        pins: [
+          { id: 'mot_p1', name: 'Pin 1 (Coil 4 - Blue)', label: 'Coil 4', type: 'SIGNAL', x: 74, y: 304 },
+          { id: 'mot_p2', name: 'Pin 2 (Coil 2 - Pink)', label: 'Coil 2', type: 'SIGNAL', x: 94, y: 304 },
+          { id: 'mot_p3', name: 'Pin 3 (5V - Red)', label: '5V', type: 'PWR', x: 114, y: 304 },
+          { id: 'mot_p4', name: 'Pin 4 (Coil 1 - Orange)', label: 'Coil 1', type: 'SIGNAL', x: 134, y: 304 },
+          { id: 'mot_p5', name: 'Pin 5 (Coil 3 - Yellow)', label: 'Coil 3', type: 'SIGNAL', x: 154, y: 304 }
+        ],
+        renderSVG: () => `
+          <g>
+            <circle cx="120" cy="90" r="75" fill="#94a3b8" stroke="#64748b" stroke-width="3"/>
+            <circle cx="40" cy="110" r="10" fill="#94a3b8" stroke="#64748b" stroke-width="2"/>
+            <circle cx="40" cy="110" r="4" fill="#0f172a"/>
+            <circle cx="200" cy="110" r="10" fill="#94a3b8" stroke="#64748b" stroke-width="2"/>
+            <circle cx="200" cy="110" r="4" fill="#0f172a"/>
+            <circle cx="120" cy="70" r="26" fill="#cbd5e1" stroke="#64748b" stroke-width="2"/>
+            <circle cx="120" cy="70" r="14" fill="#fbbf24" stroke="#d97706" stroke-width="1.5"/>
+            <circle cx="120" cy="70" r="2" fill="#0f172a"/>
+            <rect x="85" y="150" width="70" height="35" rx="4" fill="#38bdf8" stroke="#0284c7" stroke-width="2"/>
+            <path d="M 90 185 L 74 304" stroke="#3b82f6" stroke-width="5" stroke-linecap="round"/>
+            <path d="M 102 185 L 94 304" stroke="#ec4899" stroke-width="5" stroke-linecap="round"/>
+            <path d="M 120 185 L 114 304" stroke="#ef4444" stroke-width="5" stroke-linecap="round"/>
+            <path d="M 138 185 L 134 304" stroke="#f97316" stroke-width="5" stroke-linecap="round"/>
+            <path d="M 150 185 L 154 304" stroke="#eab308" stroke-width="5" stroke-linecap="round"/>
+            <text x="120" y="240" font-family="'Inter', sans-serif" font-size="10" fill="#ffffff" font-weight="bold" text-anchor="middle">28BYJ-48</text>
+            <text x="120" y="255" font-family="'JetBrains Mono', monospace" font-size="7.5" fill="#e2e8f0" text-anchor="middle">1:C4 | 2:C2 | 3:5V | 4:C1 | 5:C3</text>
+          </g>
+        `
+      },
+
+      // 5. DIGITAL STORAGE OSCILLOSCOPE
+      {
+        id: 'digital_oscilloscope',
+        name: 'Digital Oscilloscope',
+        category: 'instrument',
+        partNumber: 'DSO-100MHz 1GS/s',
+        desc: 'Benchtop digital storage oscilloscope with interactive CH1 Probe tip and Alligator Ground clip.',
+        width: 300,
+        height: 220,
+        pins: [
+          { id: 'ch1_probe', name: 'CH1 Probe Tip', label: 'PROBE', type: 'SIGNAL', x: 70, y: 195 },
+          { id: 'ch1_gnd', name: 'GND Alligator Clip', label: 'GND', type: 'GND', x: 120, y: 195 }
+        ],
+        renderSVG: () => `
+          <g>
+            <rect x="0" y="10" width="300" height="175" rx="10" fill="#1e2430" stroke="#475569" stroke-width="2.5"/>
+            <rect x="75" y="0" width="150" height="12" rx="4" fill="#334155" stroke="#475569"/>
+            <rect x="15" y="24" width="180" height="115" rx="4" fill="#090d16" stroke="#000000" stroke-width="2"/>
+            ${Array.from({length: 9}, (_, i) => `<line x1="${15 + (i+1)*18}" y1="24" x2="${15 + (i+1)*18}" y2="139" stroke="#1e3a5f" stroke-width="0.8" stroke-dasharray="2,2"/>`).join('')}
+            ${Array.from({length: 7}, (_, i) => `<line x1="15" y1="${24 + (i+1)*14.3}" x2="195" y2="${24 + (i+1)*14.3}" stroke="#1e3a5f" stroke-width="0.8" stroke-dasharray="2,2"/>`).join('')}
+            <path d="M 18 81 Q 36 40 54 81 T 90 81 T 126 81 T 162 81 T 192 81" fill="none" stroke="#facc15" stroke-width="2" stroke-linecap="round"/>
+            <path d="M 18 115 H 45 V 95 H 75 V 115 H 105 V 95 H 135 V 115 H 165 V 95 H 192" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-opacity="0.85"/>
+            <text x="20" y="36" font-family="'JetBrains Mono', monospace" font-size="7" fill="#facc15" font-weight="bold">CH1: 2.00V 1.00kHz</text>
+            <text x="120" y="36" font-family="'JetBrains Mono', monospace" font-size="7" fill="#38bdf8" font-weight="bold">CH2: 5.00V</text>
+            <text x="20" y="134" font-family="'JetBrains Mono', monospace" font-size="6.5" fill="#94a3b8">RUN | 500µs</text>
+            <circle cx="245" cy="45" r="14" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
+            <line x1="245" y1="45" x2="252" y2="38" stroke="#f8fafc" stroke-width="2"/>
+            <text x="245" y="67" font-family="'JetBrains Mono', monospace" font-size="6.5" fill="#cbd5e1" text-anchor="middle">VOLT/DIV</text>
+            <circle cx="245" cy="95" r="14" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
+            <line x1="245" y1="95" x2="245" y2="85" stroke="#f8fafc" stroke-width="2"/>
+            <text x="245" y="117" font-family="'JetBrains Mono', monospace" font-size="6.5" fill="#cbd5e1" text-anchor="middle">TIME/DIV</text>
+            <rect x="210" y="132" width="32" height="12" rx="2" fill="#15803d"/>
+            <text x="226" y="141" font-family="'JetBrains Mono', monospace" font-size="6" fill="#ffffff" font-weight="bold" text-anchor="middle">AUTO</text>
+            <rect x="250" y="132" width="34" height="12" rx="2" fill="#b91c1c"/>
+            <text x="267" y="141" font-family="'JetBrains Mono', monospace" font-size="6" fill="#ffffff" font-weight="bold" text-anchor="middle">STOP</text>
+            <circle cx="70" cy="160" r="10" fill="#475569" stroke="#94a3b8" stroke-width="2"/>
+            <circle cx="70" cy="160" r="4" fill="#facc15"/>
+            <text x="70" y="177" font-family="'JetBrains Mono', monospace" font-size="6" fill="#cbd5e1" text-anchor="middle">CH1</text>
+            <path d="M 70 170 Q 70 185 70 195" fill="none" stroke="#facc15" stroke-width="3" stroke-linecap="round"/>
+            <path d="M 70 170 Q 95 180 120 195" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"/>
+            <rect x="63" y="185" width="14" height="18" rx="2" fill="#ca8a04"/>
+            <text x="70" y="214" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="bold" fill="#facc15" text-anchor="middle">PROBE</text>
+            <rect x="113" y="185" width="14" height="18" rx="2" fill="#0f172a" stroke="#64748b"/>
+            <text x="120" y="214" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="bold" fill="#94a3b8" text-anchor="middle">GND</text>
+          </g>
+        `
+      },
+
+      // 6. USB TO TTL CONVERTER (FTDI)
       {
         id: 'usb_ttl_ftdi',
         name: 'USB to TTL (FTDI)',
@@ -671,50 +790,55 @@
         `
       },
 
-      // 6. 4-COLOR LEDS (#6)
-      ...['red', 'green', 'blue', 'yellow'].map(color => {
-        const colorConfig = {
-          red: { fill: '#ef4444', border: '#b91c1c', hex: '#ef4444', name: 'Red' },
-          green: { fill: '#22c55e', border: '#15803d', hex: '#22c55e', name: 'Green' },
-          blue: { fill: '#3b82f6', border: '#1d4ed8', hex: '#3b82f6', name: 'Blue' },
-          yellow: { fill: '#eab308', border: '#a16207', hex: '#eab308', name: 'Yellow' }
-        }[color];
+      // 7. BME280 SENSOR
+      {
+        id: 'bme280',
+        name: 'BME280 Sensor',
+        category: 'sensor',
+        partNumber: 'BME280 I2C/SPI',
+        desc: 'Precision barometric pressure, temperature, and humidity breakout module.',
+        width: 150,
+        height: 150,
+        pins: [
+          { id: 'bme_vin', name: 'VIN', label: 'VIN', type: 'PWR', x: 25, y: 130 },
+          { id: 'bme_gnd', name: 'GND', label: 'GND', type: 'GND', x: 49, y: 130 },
+          { id: 'bme_scl', name: 'SCL', label: 'SCL', type: 'I2C', x: 73, y: 130 },
+          { id: 'bme_sda', name: 'SDA', label: 'SDA', type: 'I2C', x: 97, y: 130 },
+          { id: 'bme_csb', name: 'CSB', label: 'CSB', type: 'SPI', x: 121, y: 130 },
+          { id: 'bme_sdo', name: 'SDO', label: 'SDO', type: 'SPI', x: 140, y: 130 }
+        ],
+        renderSVG: () => `
+          <g>
+            <rect x="0" y="0" width="150" height="150" rx="8" fill="#581c87" stroke="#7e22ce" stroke-width="2"/>
+            <rect x="52" y="30" width="46" height="46" rx="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1.5"/>
+            <circle cx="82" cy="42" r="3" fill="#475569"/>
+            <text x="75" y="58" font-family="'JetBrains Mono', monospace" font-size="8" fill="#1e293b" font-weight="bold" text-anchor="middle">BME</text>
+            <text x="75" y="94" font-family="'Inter', sans-serif" font-size="9" fill="#f8fafc" font-weight="bold" text-anchor="middle">BME280</text>
+            <text x="75" y="106" font-family="'JetBrains Mono', monospace" font-size="6.5" fill="#d8b4fe" text-anchor="middle">TEMP / PRESS / HUM</text>
+            <text x="25" y="122" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#f8fafc" text-anchor="middle">VIN</text>
+            <text x="49" y="122" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#f8fafc" text-anchor="middle">GND</text>
+            <text x="73" y="122" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#f8fafc" text-anchor="middle">SCL</text>
+            <text x="97" y="122" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#f8fafc" text-anchor="middle">SDA</text>
+            <text x="121" y="122" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#f8fafc" text-anchor="middle">CSB</text>
+            <text x="140" y="122" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#f8fafc" text-anchor="middle">SDO</text>
+          </g>
+        `
+      },
 
-        return {
-          id: `led_${color}`,
-          name: `5mm ${colorConfig.name} LED`,
-          category: 'discrete',
-          partNumber: `5mm ${colorConfig.name}`,
-          desc: `Optical LED with distinct LONGER Anode (+) leg and flat Cathode (-) edge. Configurable in config tab.`,
-          width: 80,
-          height: 140,
-          pins: [
-            { id: 'anode', name: 'Anode (+) Long', label: 'A(+)', type: 'PWR', x: 26, y: 125 },
-            { id: 'cathode', name: 'Cathode (-) Short', label: 'C(-)', type: 'GND', x: 54, y: 105 }
-          ],
-          renderSVG: () => `
-            <g>
-              <line x1="26" y1="65" x2="26" y2="125" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
-              <text x="22" y="115" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#f8fafc" text-anchor="end">A(+)</text>
-              <line x1="54" y1="65" x2="54" y2="105" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
-              <text x="58" y="100" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#f8fafc">C(-)</text>
-              <path d="M 16 60 A 24 24 0 1 1 64 60 Z" fill="${colorConfig.fill}" stroke="${colorConfig.border}" stroke-width="2"/>
-              <rect x="12" y="58" width="56" height="6" rx="2" fill="${colorConfig.border}"/>
-              <circle cx="32" cy="35" r="6" fill="#ffffff" opacity="0.3"/>
-              <text x="40" y="24" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#f8fafc" text-anchor="middle">${colorConfig.name.toUpperCase()}</text>
-            </g>
-          `
-        };
-      }),
-
-      // 7. RESISTORS OF 5 DIFFERENT OHM VALUES (#7)
+      // 8. RESISTORS
       createResistorDefinition('resistor_220', 220, '220Ω', '#dc2626', '#dc2626', '#78350f'),
       createResistorDefinition('resistor_330', 330, '330Ω', '#f97316', '#f97316', '#78350f'),
       createResistorDefinition('resistor_1k', 1000, '1kΩ', '#78350f', '#000000', '#dc2626'),
       createResistorDefinition('resistor_4k7', 4700, '4.7kΩ', '#facc15', '#a855f7', '#dc2626'),
       createResistorDefinition('resistor_10k', 10000, '10kΩ', '#78350f', '#000000', '#f97316'),
 
-      // 8. AT89S52 40-PIN DIP (#8)
+      // 9. NUCLEO F401RE
+      createNucleoDefinition('nucleo_401re', 'Nucleo F401RE', 'STM32F401RET6', '84 MHz'),
+
+      // 10. NUCLEO F410RB
+      createNucleoDefinition('nucleo_f410rb', 'Nucleo F410RB', 'STM32F410RBT6', '100 MHz'),
+
+      // 11. AT89S52 40-PIN DIP
       {
         id: 'at89s52',
         name: 'AT89S52 (8051 MCU)',
@@ -791,146 +915,7 @@
         `
       },
 
-      // 10. 16X2 LCD DISPLAY (#10)
-      {
-        id: 'lcd16x2',
-        name: '16x2 LCD Screen',
-        category: 'sensor',
-        partNumber: 'HD44780 / 1602A',
-        desc: 'Alphanumeric liquid crystal display with 16 labeled pins along the bottom header.',
-        width: 380,
-        height: 220,
-        pins: (() => {
-          const names = ["VSS", "VDD", "V0", "RS", "RW", "E", "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "A", "K"];
-          return names.map((name, i) => ({
-            id: `lcd_${i}`,
-            name: `${i+1}: ${name}`,
-            label: name,
-            type: (name === 'VDD' || name === 'A') ? 'PWR' : ((name === 'VSS' || name === 'K') ? 'GND' : 'SIGNAL'),
-            x: 45 + i * 19.5,
-            y: 205
-          }));
-        })(),
-        renderSVG: () => `
-          <g>
-            <rect x="0" y="0" width="380" height="220" rx="6" fill="#1b4982" stroke="#2563eb" stroke-width="2"/>
-            <rect x="25" y="25" width="330" height="135" rx="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2"/>
-            <rect x="36" y="36" width="308" height="113" rx="2" fill="#1d3d82"/>
-            <text x="190" y="85" font-family="'JetBrains Mono', monospace" font-size="13" fill="#93c5fd" font-weight="bold" text-anchor="middle" letter-spacing="2">16x2 LCD DISPLAY</text>
-            <text x="190" y="105" font-family="'JetBrains Mono', monospace" font-size="8.5" fill="#60a5fa" text-anchor="middle">HD44780 / 1602A</text>
-            <!-- 16 Pin Labels and Lead lines -->
-            ${(() => {
-              const names = ["VSS", "VDD", "V0", "RS", "RW", "E", "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "A", "K"];
-              let s = '';
-              names.forEach((name, i) => {
-                s += `
-                  <line x1="${45 + i * 19.5}" y1="195" x2="${45 + i * 19.5}" y2="218" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>
-                  <text x="${45 + i * 19.5}" y="190" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#f8fafc" text-anchor="middle">${name}</text>
-                `;
-              });
-              return s;
-            })()}
-          </g>
-        `
-      },
-
-      // 11. 4X4 KEYPAD MATRIX (#11)
-      {
-        id: 'matrix_keypad_4x4',
-        name: '4x4 Matrix Keypad',
-        category: 'interface',
-        partNumber: '4x4 Matrix (R1-R4, C1-C4)',
-        desc: '16-button matrix keypad with 8 shared row and column lines (R1-R4, C1-C4).',
-        width: 260,
-        height: 290,
-        pins: [
-          { id: 'kp_r1', name: 'Row 1 (R1)', label: 'R1', type: 'SIGNAL', x: 220, y: 35 },
-          { id: 'kp_r2', name: 'Row 2 (R2)', label: 'R2', type: 'SIGNAL', x: 220, y: 80 },
-          { id: 'kp_r3', name: 'Row 3 (R3)', label: 'R3', type: 'SIGNAL', x: 220, y: 125 },
-          { id: 'kp_r4', name: 'Row 4 (R4)', label: 'R4', type: 'SIGNAL', x: 220, y: 170 },
-          { id: 'kp_c1', name: 'Col 1 (C1)', label: 'C1', type: 'SIGNAL', x: 35, y: 272 },
-          { id: 'kp_c2', name: 'Col 2 (C2)', label: 'C2', type: 'SIGNAL', x: 75, y: 272 },
-          { id: 'kp_c3', name: 'Col 3 (C3)', label: 'C3', type: 'SIGNAL', x: 115, y: 272 },
-          { id: 'kp_c4', name: 'Col 4 (C4)', label: 'C4', type: 'SIGNAL', x: 155, y: 272 }
-        ],
-        renderSVG: () => `
-          <g>
-            <rect x="15" y="15" width="230" height="245" rx="10" fill="#181a20" stroke="#334155" stroke-width="2"/>
-            ${[
-              ['1','2','3','A'],
-              ['4','5','6','B'],
-              ['7','8','9','C'],
-              ['*','0','#','D']
-            ].flatMap((row, rIdx) => 
-              row.map((key, cIdx) => `
-                <g transform="translate(${25 + cIdx * 45}, ${25 + rIdx * 45})">
-                  <rect width="36" height="36" rx="6" fill="#2a3040" stroke="#475569" stroke-width="1.5"/>
-                  <text x="18" y="23" font-family="'Inter', sans-serif" font-size="14" fill="${['A','B','C','D'].includes(key) ? '#f87171' : '#f8fafc'}" font-weight="bold" text-anchor="middle">${key}</text>
-                </g>
-              `)
-            ).join('')}
-            ${[35, 80, 125, 170].map((y, i) => `
-              <line x1="205" y1="${y}" x2="220" y2="${y}" stroke="#cbd5e1" stroke-width="2"/>
-              <text x="195" y="${y + 3}" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="bold" fill="#38bdf8" text-anchor="end">R${i+1}</text>
-            `).join('')}
-            ${[35, 75, 115, 155].map((x, i) => `
-              <line x1="${x}" y1="205" x2="${x}" y2="272" stroke="#cbd5e1" stroke-width="2"/>
-              <text x="${x}" y="200" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="bold" fill="#f87171" text-anchor="middle">C${i+1}</text>
-            `).join('')}
-            <text x="130" y="240" font-family="'JetBrains Mono', monospace" font-size="7" fill="#64748b" text-anchor="middle">4x4 MATRIX KEYPAD</text>
-          </g>
-        `
-      },
-
-      // 12. DIGITAL STORAGE OSCILLOSCOPE (#12)
-      {
-        id: 'digital_oscilloscope',
-        name: 'Digital Oscilloscope',
-        category: 'instrument',
-        partNumber: 'DSO-100MHz 1GS/s',
-        desc: 'Benchtop digital storage oscilloscope with interactive CH1 Probe tip and Alligator Ground clip.',
-        width: 300,
-        height: 220,
-        pins: [
-          { id: 'ch1_probe', name: 'CH1 Probe Tip', label: 'PROBE', type: 'SIGNAL', x: 70, y: 195 },
-          { id: 'ch1_gnd', name: 'GND Alligator Clip', label: 'GND', type: 'GND', x: 120, y: 195 }
-        ],
-        renderSVG: () => `
-          <g>
-            <rect x="0" y="10" width="300" height="175" rx="10" fill="#1e2430" stroke="#475569" stroke-width="2.5"/>
-            <rect x="75" y="0" width="150" height="12" rx="4" fill="#334155" stroke="#475569"/>
-            <rect x="15" y="24" width="180" height="115" rx="4" fill="#090d16" stroke="#000000" stroke-width="2"/>
-            ${Array.from({length: 9}, (_, i) => `<line x1="${15 + (i+1)*18}" y1="24" x2="${15 + (i+1)*18}" y2="139" stroke="#1e3a5f" stroke-width="0.8" stroke-dasharray="2,2"/>`).join('')}
-            ${Array.from({length: 7}, (_, i) => `<line x1="15" y1="${24 + (i+1)*14.3}" x2="195" y2="${24 + (i+1)*14.3}" stroke="#1e3a5f" stroke-width="0.8" stroke-dasharray="2,2"/>`).join('')}
-            <path d="M 18 81 Q 36 40 54 81 T 90 81 T 126 81 T 162 81 T 192 81" fill="none" stroke="#facc15" stroke-width="2" stroke-linecap="round"/>
-            <path d="M 18 115 H 45 V 95 H 75 V 115 H 105 V 95 H 135 V 115 H 165 V 95 H 192" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-opacity="0.85"/>
-            <text x="20" y="36" font-family="'JetBrains Mono', monospace" font-size="7" fill="#facc15" font-weight="bold">CH1: 2.00V 1.00kHz</text>
-            <text x="120" y="36" font-family="'JetBrains Mono', monospace" font-size="7" fill="#38bdf8" font-weight="bold">CH2: 5.00V</text>
-            <text x="20" y="134" font-family="'JetBrains Mono', monospace" font-size="6.5" fill="#94a3b8">RUN | 500µs</text>
-            <circle cx="245" cy="45" r="14" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
-            <line x1="245" y1="45" x2="252" y2="38" stroke="#f8fafc" stroke-width="2"/>
-            <text x="245" y="67" font-family="'JetBrains Mono', monospace" font-size="6.5" fill="#cbd5e1" text-anchor="middle">VOLT/DIV</text>
-            <circle cx="245" cy="95" r="14" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
-            <line x1="245" y1="95" x2="245" y2="85" stroke="#f8fafc" stroke-width="2"/>
-            <text x="245" y="117" font-family="'JetBrains Mono', monospace" font-size="6.5" fill="#cbd5e1" text-anchor="middle">TIME/DIV</text>
-            <rect x="210" y="132" width="32" height="12" rx="2" fill="#15803d"/>
-            <text x="226" y="141" font-family="'JetBrains Mono', monospace" font-size="6" fill="#ffffff" font-weight="bold" text-anchor="middle">AUTO</text>
-            <rect x="250" y="132" width="34" height="12" rx="2" fill="#b91c1c"/>
-            <text x="267" y="141" font-family="'JetBrains Mono', monospace" font-size="6" fill="#ffffff" font-weight="bold" text-anchor="middle">STOP</text>
-            <circle cx="70" cy="160" r="10" fill="#475569" stroke="#94a3b8" stroke-width="2"/>
-            <circle cx="70" cy="160" r="4" fill="#facc15"/>
-            <text x="70" y="177" font-family="'JetBrains Mono', monospace" font-size="6" fill="#cbd5e1" text-anchor="middle">CH1</text>
-            <path d="M 70 170 Q 70 185 70 195" fill="none" stroke="#facc15" stroke-width="3" stroke-linecap="round"/>
-            <path d="M 70 170 Q 95 180 120 195" fill="none" stroke="#475569" stroke-width="2.5" stroke-linecap="round"/>
-            <rect x="63" y="185" width="14" height="18" rx="2" fill="#ca8a04"/>
-            <text x="70" y="214" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="bold" fill="#facc15" text-anchor="middle">PROBE</text>
-            <rect x="113" y="185" width="14" height="18" rx="2" fill="#0f172a" stroke="#64748b"/>
-            <text x="120" y="214" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="bold" fill="#94a3b8" text-anchor="middle">GND</text>
-          </g>
-        `
-      },
-
-      // 13. 7-SEGMENT DISPLAY (#13)
+      // 12. 7-SEGMENT DISPLAY
       {
         id: 'seven_segment',
         name: '7-Segment Display',
@@ -984,85 +969,49 @@
         `
       },
 
-      // 14. STEPPER MOTOR 28BYJ-48 (#14)
+      // 13. 16X2 LCD DISPLAY
       {
-        id: 'stepper_28byj48',
-        name: '28BYJ-48 Stepper Motor',
-        category: 'actuator',
-        partNumber: '28BYJ-48 5V Stepper',
-        desc: '5-wire unipolar stepper motor with 5-pin connector harness (Coil 4, Coil 2, 5V, Coil 1, Coil 3).',
-        width: 240,
-        height: 320,
-        pins: [
-          { id: 'mot_p1', name: 'Pin 1 (Coil 4 - Blue)', label: 'Coil 4', type: 'SIGNAL', x: 74, y: 304 },
-          { id: 'mot_p2', name: 'Pin 2 (Coil 2 - Pink)', label: 'Coil 2', type: 'SIGNAL', x: 94, y: 304 },
-          { id: 'mot_p3', name: 'Pin 3 (5V - Red)', label: '5V', type: 'PWR', x: 114, y: 304 },
-          { id: 'mot_p4', name: 'Pin 4 (Coil 1 - Orange)', label: 'Coil 1', type: 'SIGNAL', x: 134, y: 304 },
-          { id: 'mot_p5', name: 'Pin 5 (Coil 3 - Yellow)', label: 'Coil 3', type: 'SIGNAL', x: 154, y: 304 }
-        ],
+        id: 'lcd16x2',
+        name: '16x2 LCD Screen',
+        category: 'sensor',
+        partNumber: 'HD44780 / 1602A',
+        desc: 'Alphanumeric liquid crystal display with 16 labeled pins along the bottom header.',
+        width: 380,
+        height: 220,
+        pins: (() => {
+          const names = ["VSS", "VDD", "V0", "RS", "RW", "E", "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "A", "K"];
+          return names.map((name, i) => ({
+            id: `lcd_${i}`,
+            name: `${i+1}: ${name}`,
+            label: name,
+            type: (name === 'VDD' || name === 'A') ? 'PWR' : ((name === 'VSS' || name === 'K') ? 'GND' : 'SIGNAL'),
+            x: 45 + i * 19.5,
+            y: 205
+          }));
+        })(),
         renderSVG: () => `
           <g>
-            <circle cx="120" cy="90" r="75" fill="#94a3b8" stroke="#64748b" stroke-width="3"/>
-            <circle cx="40" cy="110" r="10" fill="#94a3b8" stroke="#64748b" stroke-width="2"/>
-            <circle cx="40" cy="110" r="4" fill="#0f172a"/>
-            <circle cx="200" cy="110" r="10" fill="#94a3b8" stroke="#64748b" stroke-width="2"/>
-            <circle cx="200" cy="110" r="4" fill="#0f172a"/>
-            <circle cx="120" cy="70" r="26" fill="#cbd5e1" stroke="#64748b" stroke-width="2"/>
-            <circle cx="120" cy="70" r="14" fill="#fbbf24" stroke="#d97706" stroke-width="1.5"/>
-            <circle cx="120" cy="70" r="2" fill="#0f172a"/>
-            <rect x="85" y="150" width="70" height="35" rx="4" fill="#38bdf8" stroke="#0284c7" stroke-width="2"/>
-            <path d="M 90 185 L 74 304" stroke="#3b82f6" stroke-width="5" stroke-linecap="round"/>
-            <path d="M 102 185 L 94 304" stroke="#ec4899" stroke-width="5" stroke-linecap="round"/>
-            <path d="M 120 185 L 114 304" stroke="#ef4444" stroke-width="5" stroke-linecap="round"/>
-            <path d="M 138 185 L 134 304" stroke="#f97316" stroke-width="5" stroke-linecap="round"/>
-            <path d="M 150 185 L 154 304" stroke="#eab308" stroke-width="5" stroke-linecap="round"/>
-            <text x="120" y="240" font-family="'Inter', sans-serif" font-size="10" fill="#ffffff" font-weight="bold" text-anchor="middle">28BYJ-48</text>
-            <text x="120" y="255" font-family="'JetBrains Mono', monospace" font-size="7.5" fill="#e2e8f0" text-anchor="middle">1:C4 | 2:C2 | 3:5V | 4:C1 | 5:C3</text>
+            <rect x="0" y="0" width="380" height="220" rx="6" fill="#1b4982" stroke="#2563eb" stroke-width="2"/>
+            <rect x="25" y="25" width="330" height="135" rx="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2"/>
+            <rect x="36" y="36" width="308" height="113" rx="2" fill="#1d3d82"/>
+            <text x="190" y="85" font-family="'JetBrains Mono', monospace" font-size="13" fill="#93c5fd" font-weight="bold" text-anchor="middle" letter-spacing="2">16x2 LCD DISPLAY</text>
+            <text x="190" y="105" font-family="'JetBrains Mono', monospace" font-size="8.5" fill="#60a5fa" text-anchor="middle">HD44780 / 1602A</text>
+            ${(() => {
+              const names = ["VSS", "VDD", "V0", "RS", "RW", "E", "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "A", "K"];
+              let s = '';
+              names.forEach((name, i) => {
+                s += `
+                  <line x1="${45 + i * 19.5}" y1="195" x2="${45 + i * 19.5}" y2="218" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>
+                  <text x="${45 + i * 19.5}" y="190" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#f8fafc" text-anchor="middle">${name}</text>
+                `;
+              });
+              return s;
+            })()}
           </g>
         `
       },
 
-      // 15. PUSHBUTTON (#15)
-      {
-        id: 'pushbutton_tactile',
-        name: 'Tactile Pushbutton',
-        category: 'discrete',
-        partNumber: '6x6mm SPST Tactile',
-        desc: 'Momentary 4-terminal tactile switch with solder leads and raised button plunger.',
-        width: 110,
-        height: 110,
-        pins: [
-          { id: 'pb_1a', name: 'Pin 1A', label: '1A', type: 'SW', x: 16, y: 28 },
-          { id: 'pb_1b', name: 'Pin 1B', label: '1B', type: 'SW', x: 16, y: 82 },
-          { id: 'pb_2a', name: 'Pin 2A', label: '2A', type: 'SW', x: 94, y: 28 },
-          { id: 'pb_2b', name: 'Pin 2B', label: '2B', type: 'SW', x: 94, y: 82 }
-        ],
-        renderSVG: () => `
-          <g>
-            <rect x="6" y="20" width="16" height="16" rx="1" fill="#cbd5e1" stroke="#64748b"/>
-            <rect x="6" y="74" width="16" height="16" rx="1" fill="#cbd5e1" stroke="#64748b"/>
-            <rect x="88" y="20" width="16" height="16" rx="1" fill="#cbd5e1" stroke="#64748b"/>
-            <rect x="88" y="74" width="16" height="16" rx="1" fill="#cbd5e1" stroke="#64748b"/>
-            <rect x="18" y="16" width="74" height="78" rx="6" fill="#2a3040" stroke="#475569" stroke-width="2"/>
-            <rect x="22" y="20" width="66" height="70" rx="4" fill="#1e2430"/>
-            <circle cx="28" cy="26" r="2.5" fill="#94a3b8"/>
-            <circle cx="82" cy="26" r="2.5" fill="#94a3b8"/>
-            <circle cx="28" cy="84" r="2.5" fill="#94a3b8"/>
-            <circle cx="82" cy="84" r="2.5" fill="#94a3b8"/>
-            <circle cx="55" cy="55" r="20" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
-            <circle cx="55" cy="55" r="14" fill="#e2e8f0"/>
-            <circle cx="55" cy="55" r="11" fill="#f8fafc"/>
-            <text x="34" y="32" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc">1A</text>
-            <text x="34" y="86" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc">1B</text>
-            <text x="76" y="32" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc" text-anchor="end">2A</text>
-            <text x="76" y="86" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc" text-anchor="end">2B</text>
-          </g>
-        `
-      },
-
-      // 16. BME280 SENSOR (Already listed above as #11, kept unified in catalog)
-      
-      // 4 DIFFERENT COLOR 5MM LEDs
+      // 14. 4 DIFFERENT COLOR 5MM LEDs
       ...['red', 'green', 'blue', 'yellow'].map(color => {
         const colorConfig = {
           red: { fill: '#ef4444', border: '#b91c1c', hex: '#ef4444', name: 'Red' },
@@ -1135,7 +1084,7 @@
       printMode: false
     };
 
-    const STORAGE_KEY = 'iotrace_circuit_autosave_v4';
+    const STORAGE_KEY = 'iotrace_circuit_autosave_v5';
 
     const viewportContainer = document.getElementById('viewport-container');
     const canvasWorld = document.getElementById('canvas-world');
@@ -1341,123 +1290,6 @@
       persistToLocalStorage();
       setBannerText(`Pasted ${newCompIds.length} component(s). Drag to move together.`);
     }
-
-    /* ==========================================================================
-       AUTO-CONNECT BLOCK (ROUTING OUT OF BOARD BOUNDS FIRST)
-       ========================================================================== */
-    function openAutoConnectModal() {
-      if (state.components.length < 1) {
-        alert("Please add at least one component to the canvas first.");
-        return;
-      }
-      populateAutoConnectDropdowns();
-      document.getElementById('autoconnect-modal').classList.remove('hidden');
-    }
-
-    function closeAutoConnectModal() {
-      document.getElementById('autoconnect-modal').classList.add('hidden');
-    }
-
-    function populateAutoConnectDropdowns() {
-      const fromCompSel = document.getElementById('ac-from-comp');
-      const toCompSel = document.getElementById('ac-to-comp');
-      fromCompSel.innerHTML = '';
-      toCompSel.innerHTML = '';
-
-      state.components.forEach(c => {
-        const cat = CATALOG.find(item => item.id === c.catalogId);
-        const name = `${c.customName} (${c.id.substring(0,5)})`;
-        fromCompSel.add(new Option(name, c.id));
-        toCompSel.add(new Option(name, c.id));
-      });
-
-      if (state.components.length > 1) {
-        toCompSel.selectedIndex = 1;
-      }
-      updateAcPins('from');
-      updateAcPins('to');
-    }
-
-    function updateAcPins(which) {
-      const compId = document.getElementById(`ac-${which}-comp`).value;
-      const pinSel = document.getElementById(`ac-${which}-pin`);
-      pinSel.innerHTML = '';
-
-      const comp = state.components.find(c => c.id === compId);
-      if (!comp) return;
-      const cat = CATALOG.find(item => item.id === comp.catalogId);
-      if (!cat) return;
-
-      cat.pins.forEach(p => {
-        pinSel.add(new Option(`${p.name} (${p.type})`, p.id));
-      });
-    }
-
-    // Advanced router that steps OUTSIDE the board boundaries first before connecting 90° Manhattan
-    function executeAutoConnect() {
-      const fromCompId = document.getElementById('ac-from-comp').value;
-      const fromPinId = document.getElementById('ac-from-pin').value;
-      const toCompId = document.getElementById('ac-to-comp').value;
-      const toPinId = document.getElementById('ac-to-pin').value;
-
-      if (!fromCompId || !fromPinId || !toCompId || !toPinId) {
-        alert("Please select valid components and pins.");
-        return;
-      }
-
-      if (fromCompId === toCompId && fromPinId === toPinId) {
-        alert("Cannot connect a pin to itself.");
-        return;
-      }
-
-      saveHistory();
-
-      const fromCoord = getPinAbsoluteCoords(fromCompId, fromPinId);
-      const toCoord = getPinAbsoluteCoords(toCompId, toPinId);
-      const fromComp = state.components.find(c => c.id === fromCompId);
-      const toComp = state.components.find(c => c.id === toCompId);
-      const fromCat = CATALOG.find(item => item.id === fromComp.catalogId);
-      const toCat = CATALOG.find(item => item.id === toComp.catalogId);
-
-      // Compute bounding box extents to route OUTSIDE board boundaries first
-      const fromBox = { left: fromComp.x, right: fromComp.x + fromCat.width, top: fromComp.y, bottom: fromComp.y + fromCat.height };
-      const toBox = { left: toComp.x, right: toComp.x + toCat.width, top: toComp.y, bottom: toComp.y + toCat.height };
-
-      const outPad = 35;
-      // Determine safe escape exit vectors away from board centers
-      const escapeX1 = fromCoord.x >= fromBox.left + fromCat.width / 2 ? fromBox.right + outPad : fromBox.left - outPad;
-      const escapeX2 = toCoord.x >= toBox.left + toCat.width / 2 ? toBox.right + outPad : toBox.left - outPad;
-      const midX = snap((escapeX1 + escapeX2) / 2, 10);
-
-      const waypoints = [
-        { x: fromCoord.x, y: fromCoord.y },
-        { x: snap(escapeX1, 10), y: fromCoord.y },
-        { x: snap(escapeX1, 10), y: snap((fromCoord.y + toCoord.y) / 2, 10) },
-        { x: snap(escapeX2, 10), y: snap((fromCoord.y + toCoord.y) / 2, 10) },
-        { x: snap(escapeX2, 10), y: toCoord.y },
-        { x: toCoord.x, y: toCoord.y }
-      ];
-
-      state.wires.push({
-        id: 'wire_' + Date.now(),
-        from: { compId: fromCompId, pinId: fromPinId },
-        to: { compId: toCompId, pinId: toPinId },
-        color: state.activeWireColor,
-        manualWaypoints: waypoints
-      });
-
-      renderWires();
-      updatePinBadges();
-      updateNetlistUI();
-      closeAutoConnectModal();
-      setBannerText("Auto-Connect cleanly routed outside board bounds!");
-    }
-
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !document.getElementById('autoconnect-modal').classList.contains('hidden')) {
-        executeAutoConnect();
-      }
-    });
 
     /* ==========================================================================
        3. CANVAS MECHANICS (PAN, ZOOM, GRID SNAP)
@@ -2648,7 +2480,7 @@
         return;
       }
 
-      // Default demo setup: Wemos + Bluepill + Stepper Motor + Matrix Keypad
+      // Default demo setup: Wemos + Bluepill + Stepper Motor + Keypad
       spawnComponent('wemos_d1_mini', 60, 240);
       const wemos = state.components[0];
 
