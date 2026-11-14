@@ -1150,49 +1150,62 @@
         `
       },
 
-      // 16. BME280 SENSOR (Already listed above as #11, kept unified in catalog)
-      // BME280 SENSOR MODULE
-    {
-      id: 'bme280_sensor',
-      name: 'BME280 Sensor',
-      category: 'sensor',
-      partNumber: 'GY-BME280 I2C/SPI',
-      desc: 'Barometric pressure, humidity, and temperature breakout board.',
-      width: 150,
-      height: 170,
-      pins: [
-        { id: 'bme_vcc', name: 'VCC', label: 'VCC', type: 'PWR', x: 25, y: 156 },
-        { id: 'bme_gnd', name: 'GND', label: 'GND', type: 'GND', x: 45, y: 156 },
-        { id: 'bme_scl', name: 'SCL', label: 'SCL', type: 'CLOCK', x: 65, y: 156 },
-        { id: 'bme_sda', name: 'SDA', label: 'SDA', type: 'DATA', x: 85, y: 156 },
-        { id: 'bme_csb', name: 'CSB', label: 'CSB', type: 'CTRL', x: 105, y: 156 },
-        { id: 'bme_sdo', name: 'SDO', label: 'SDO', type: 'DATA', x: 125, y: 156 }
-      ],
-      renderSVG: (comp = {}, hiddenPins = new Set()) => {
-        const labels = [
-          { id: 'bme_vcc', txt: 'VCC', x: 25 },
-          { id: 'bme_gnd', txt: 'GND', x: 45 },
-          { id: 'bme_scl', txt: 'SCL', x: 65 },
-          { id: 'bme_sda', txt: 'SDA', x: 85 },
-          { id: 'bme_csb', txt: 'CSB', x: 105 },
-          { id: 'bme_sdo', txt: 'SDO', x: 125 }
-        ];
-        return `
-          <g>
-            <rect x="10" y="10" width="130" height="145" rx="8" fill="#4c1d95" stroke="#7c3aed" stroke-width="2"/>
-            <circle cx="24" cy="24" r="5" fill="#0f172a" stroke="#eab308" stroke-width="1.5"/>
-            <circle cx="126" cy="24" r="5" fill="#0f172a" stroke="#eab308" stroke-width="1.5"/>
-            <rect x="57" y="45" width="36" height="36" rx="3" fill="#cbd5e1" stroke="#64748b" stroke-width="1.5"/>
-            <circle cx="82" cy="56" r="2.5" fill="#1e293b"/>
-            <text x="75" y="102" font-family="'Inter', sans-serif" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">BME280</text>
-            <text x="75" y="114" font-family="'JetBrains Mono', monospace" font-size="7" fill="#c4b5fd" text-anchor="middle">TEMP / HUM / PRESS</text>
-            ${labels.map(p => !hiddenPins.has(p.id) ? `
-              <text x="${p.x}" y="142" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="bold" fill="#f8fafc" text-anchor="middle">${p.txt}</text>
-            ` : '').join('')}
-          </g>
-        `;
-      }
-    },
+      // BME280 SENSOR MODULE (Matches GY-BME280 vertical right-edge pinout)
+      {
+        id: 'bme280_sensor',
+        name: 'BME280 Sensor',
+        category: 'sensor',
+        partNumber: 'GY-BME280 I2C/SPI',
+        desc: 'Barometric pressure, humidity, and temperature breakout board with right-side vertical header.',
+        width: 150,
+        height: 190,
+        pins: [
+          { id: 'bme_vcc', name: 'VCC (3.3V)', label: 'VCC', type: 'PWR', x: 132, y: 30, side: 'right' },
+          { id: 'bme_gnd', name: 'GND (Ground)', label: 'GND', type: 'GND', x: 132, y: 56, side: 'right' },
+          { id: 'bme_scl', name: 'SCL (Serial Clock)', label: 'SCL', type: 'CLOCK', x: 132, y: 82, side: 'right' },
+          { id: 'bme_sda', name: 'SDA (Serial Data)', label: 'SDA', type: 'DATA', x: 132, y: 108, side: 'right' },
+          { id: 'bme_csb', name: 'CSB (Chip Select)', label: 'CSB', type: 'CTRL', x: 132, y: 134, side: 'right' },
+          { id: 'bme_sdo', name: 'SDO (Serial Data Out)', label: 'SDO', type: 'DATA', x: 132, y: 160, side: 'right' }
+        ],
+        renderSVG: (comp = {}, hiddenPins = new Set()) => {
+          const pinRows = [
+            { id: 'bme_vcc', txt: 'VCC', y: 30 },
+            { id: 'bme_gnd', txt: 'GND', y: 56 },
+            { id: 'bme_scl', txt: 'SCL', y: 82 },
+            { id: 'bme_sda', txt: 'SDA', y: 108 },
+            { id: 'bme_csb', txt: 'CSB', y: 134 },
+            { id: 'bme_sdo', txt: 'SDO', y: 160 }
+          ];
+          return `
+            <g>
+              <!-- Purple PCB Substrate -->
+              <rect x="8" y="10" width="134" height="170" rx="6" fill="#581c87" stroke="#7e22ce" stroke-width="2"/>
+              
+              <!-- Two Large Brass Mounting Holes on Left -->
+              <circle cx="34" cy="36" r="14" fill="#d4af37" stroke="#92400e" stroke-width="1.5"/>
+              <circle cx="34" cy="36" r="7" fill="#0f172a"/>
+              <circle cx="34" cy="154" r="14" fill="#d4af37" stroke="#92400e" stroke-width="1.5"/>
+              <circle cx="34" cy="154" r="7" fill="#0f172a"/>
+
+              <!-- Metallic BME280 Sensor Can & Silkscreen -->
+              <rect x="22" y="76" width="24" height="24" rx="2" fill="#cbd5e1" stroke="#64748b" stroke-width="1.5"/>
+              <circle cx="39" cy="83" r="2" fill="#1e293b"/>
+              <text x="34" y="114" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="bold" fill="#f3e8ff" text-anchor="middle">GY-BM</text>
+              <text x="34" y="124" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="bold" fill="#f3e8ff" text-anchor="middle">ME/PM</text>
+              <text x="34" y="134" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="bold" fill="#f3e8ff" text-anchor="middle">280</text>
+
+              <!-- Vertical Right-Side Pin Labels & Gold Pads -->
+              ${pinRows.map(p => `
+                <circle cx="132" cy="${p.y}" r="5.5" fill="#eab308" stroke="#854d0e" stroke-width="1"/>
+                ${!hiddenPins.has(p.id) ? `
+                  <text x="120" y="${p.y + 3}" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="end">${p.txt}</text>
+                ` : ''}
+              `).join('')}
+            </g>
+          `;
+        }
+      },
+
 
       // 4 DIFFERENT COLOR 5MM LEDs
       ...['red', 'green', 'blue', 'yellow'].map(color => {
@@ -2378,6 +2391,11 @@
 
       div.addEventListener('mousedown', (e) => {
         if (e.target.closest('.pin-terminal')) return;
+
+        // Allow 90° wire waypoint anchoring directly on top of both Nucleo boards
+        if (state.wiring && (comp.catalogId === 'nucleo_401re' || comp.catalogId === 'nucleo_f410rb')) {
+          return;
+        }
 
         if (e.shiftKey) {
           if (state.selectedCompIds.includes(comp.id)) {
