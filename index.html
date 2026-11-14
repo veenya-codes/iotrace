@@ -428,40 +428,54 @@
     }
 
     function createNucleoDefinition(id, name, partNumber, freqText) {
-      const w = 380;
+      const w = 440;
       const h = 470;
       const pins = [];
 
-      for (let i = 0; i < 19; i++) {
-        const py = 160 + i * 15;
-        pins.push({ id: `cn7_l_${i}`, name: `PC${i*2}`, label: `PC${i*2}`, type: 'GPIO', x: 17, y: py, side: 'left' });
-        pins.push({ id: `cn7_r_${i}`, name: `PC${i*2+1}`, label: `PC${i*2+1}`, type: 'GPIO', x: 31, y: py, side: 'left' });
-      }
+      const isF410 = id === 'nucleo_f410rb';
+
+      // CN7 Left Morpho Header (19 rows)
+      const cn7Left = ["PC10", "PC12", "VDD", "BOOT0", "NC", "NC", "PA13", "PA14", "PA15", "GND", "PB7", "PC13", "PC14", "PC15", "PH0", "PH1", "VBAT", "PC2", "PC3"];
+      const cn7Right = ["PC11", isF410 ? "PB11" : "PD2", "E5V", "GND", "NC", "IOREF", "RESET", "+3V3", "+5V", "GND", "GND", "VIN", "NC", "PA0", "PA1", "PA4", "PB0", "PC1", "PC0"];
 
       for (let i = 0; i < 19; i++) {
         const py = 160 + i * 15;
-        pins.push({ id: `cn10_l_${i}`, name: `PB${i*2}`, label: `PB${i*2}`, type: 'GPIO', x: 349, y: py, side: 'right' });
-        pins.push({ id: `cn10_r_${i}`, name: `PB${i*2+1}`, label: `PB${i*2+1}`, type: 'GPIO', x: 363, y: py, side: 'right' });
+        pins.push({ id: `cn7_l_${i}`, name: `CN7-${i*2+1} (${cn7Left[i]})`, label: cn7Left[i], type: cn7Left[i] === 'GND' ? 'GND' : (cn7Left[i].includes('V') ? 'PWR' : 'GPIO'), x: 46, y: py, side: 'left' });
+        pins.push({ id: `cn7_r_${i}`, name: `CN7-${i*2+2} (${cn7Right[i]})`, label: cn7Right[i], type: cn7Right[i] === 'GND' ? 'GND' : (cn7Right[i].includes('V') ? 'PWR' : 'GPIO'), x: 60, y: py, side: 'left' });
       }
 
-      const leftPwr = ["NC", "IOREF", "NRST", "3V3", "5V", "GND", "GND", "VIN"];
+      // CN10 Right Morpho Header (19 rows)
+      const cn10Left = ["PC9", "PB8", "PB9", "AVDD", "GND", "PA5", "PA6", "PA7", "PB6", "PC7", "PA9", "PA8", "PB10", "PB4", "PB5", "PB3", "PA10", "PA2", "PA3"];
+      const cn10Right = ["PC8", "PC6", "PC5", "U5V", "NC", "PA12", "PA11", "PB12", "NC", "GND", "PB2", "PB1", "PB15", "PB14", "PB13", "AGND", "PC4", "NC", "NC"];
+
+      for (let i = 0; i < 19; i++) {
+        const py = 160 + i * 15;
+        pins.push({ id: `cn10_l_${i}`, name: `CN10-${i*2+1} (${cn10Left[i]})`, label: cn10Left[i], type: cn10Left[i].includes('GND') ? 'GND' : (cn10Left[i].includes('V') ? 'PWR' : 'GPIO'), x: 380, y: py, side: 'right' });
+        pins.push({ id: `cn10_r_${i}`, name: `CN10-${i*2+2} (${cn10Right[i]})`, label: cn10Right[i], type: cn10Right[i].includes('GND') ? 'GND' : (cn10Right[i].includes('V') ? 'PWR' : 'GPIO'), x: 394, y: py, side: 'right' });
+      }
+
+      // CN6 Arduino Power (8 pins)
+      const leftPwr = ["NC", "IOREF", "RESET", "+3V3", "+5V", "GND", "GND", "VIN"];
       leftPwr.forEach((lbl, i) => {
-        pins.push({ id: `ard_pwr_${i}`, name: lbl, label: lbl, type: lbl.includes("GND") ? "GND" : (lbl.includes("V") ? "PWR" : "ADC"), x: 61, y: 175 + i * 16, side: 'right' });
+        pins.push({ id: `ard_pwr_${i}`, name: `CN6 (${lbl})`, label: lbl, type: lbl.includes("GND") ? "GND" : (lbl.includes("V") ? "PWR" : "CTRL"), x: 96, y: 175 + i * 16, side: 'right' });
       });
 
+      // CN8 Arduino Analog (6 pins)
       const leftAnalog = ["A0", "A1", "A2", "A3", "A4", "A5"];
       leftAnalog.forEach((lbl, i) => {
-        pins.push({ id: `ard_ana_${i}`, name: lbl, label: lbl, type: "ADC", x: 61, y: 320 + i * 16, side: 'right' });
+        pins.push({ id: `ard_ana_${i}`, name: `CN8 (${lbl})`, label: lbl, type: "ADC", x: 96, y: 320 + i * 16, side: 'right' });
       });
 
+      // CN5 Arduino Digital High (10 pins)
       const rightDigHigh = ["D15", "D14", "AVDD", "GND", "D13", "D12", "D11", "D10", "D9", "D8"];
       rightDigHigh.forEach((lbl, i) => {
-        pins.push({ id: `ard_digh_${i}`, name: lbl, label: lbl, type: lbl.includes("GND") ? "GND" : (lbl.includes("AVDD") ? "PWR" : "GPIO"), x: 319, y: 160 + i * 15, side: 'left' });
+        pins.push({ id: `ard_digh_${i}`, name: `CN5 (${lbl})`, label: lbl, type: lbl.includes("GND") ? "GND" : (lbl.includes("AVDD") ? "PWR" : "GPIO"), x: 344, y: 160 + i * 15, side: 'left' });
       });
 
+      // CN9 Arduino Digital Low (8 pins)
       const rightDigLow = ["D7", "D6", "D5", "D4", "D3", "D2", "D1", "D0"];
       rightDigLow.forEach((lbl, i) => {
-        pins.push({ id: `ard_digl_${i}`, name: lbl, label: lbl, type: "GPIO", x: 319, y: 325 + i * 15, side: 'left' });
+        pins.push({ id: `ard_digl_${i}`, name: `CN9 (${lbl})`, label: lbl, type: "GPIO", x: 344, y: 325 + i * 15, side: 'left' });
       });
 
       return {
@@ -469,7 +483,7 @@
         name,
         category: 'mcu',
         partNumber,
-        desc: `STMicroelectronics ARM Cortex-M4 Nucleo-64 (${freqText}) with properly aligned headers.`,
+        desc: `STMicroelectronics ARM Cortex-M4 Nucleo-64 (${freqText}) with authentic CN5/CN6/CN7/CN8/CN9/CN10 pinouts.`,
         width: w,
         height: h,
         pins,
@@ -484,34 +498,49 @@
             <line x1="8" y1="100" x2="${w-8}" y2="100" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4,4"/>
             <text x="${w/2}" y="120" font-family="'Inter', sans-serif" font-size="12" fill="#1e293b" font-weight="bold" text-anchor="middle" letter-spacing="1">${name.toUpperCase()}</text>
             <text x="${w/2}" y="134" font-family="'JetBrains Mono', monospace" font-size="7" fill="#64748b" text-anchor="middle">${partNumber} ${freqText}</text>
-            <circle cx="110" cy="165" r="9" fill="#2563eb"/>
-            <text x="110" y="184" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#1e293b" text-anchor="middle">B1 USER</text>
-            <circle cx="270" cy="165" r="9" fill="#1e293b"/>
-            <text x="270" y="184" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#1e293b" text-anchor="middle">B2 RESET</text>
+            <circle cx="148" cy="165" r="9" fill="#2563eb"/>
+            <text x="148" y="184" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#1e293b" text-anchor="middle">B1 USER</text>
+            <circle cx="292" cy="165" r="9" fill="#1e293b"/>
+            <text x="292" y="184" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#1e293b" text-anchor="middle">B2 RESET</text>
             <g transform="translate(${w/2 - 35}, 225)">
               <rect x="0" y="0" width="70" height="70" rx="4" fill="#181d24" stroke="#334155" stroke-width="1.5"/>
               <text x="35" y="32" font-family="'Inter', sans-serif" font-size="8.5" fill="#f8fafc" font-weight="bold" text-anchor="middle">STM32</text>
               <text x="35" y="46" font-family="'JetBrains Mono', monospace" font-size="6.5" fill="#38bdf8" text-anchor="middle">${partNumber.replace('STM32', '')}</text>
             </g>
-            <rect x="10" y="150" width="28" height="295" rx="2" fill="#181a20" stroke="#334155"/>
-            <text x="24" y="145" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#64748b" text-anchor="middle">CN7</text>
-            <rect x="342" y="150" width="28" height="295" rx="2" fill="#181a20" stroke="#334155"/>
-            <text x="356" y="145" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#64748b" text-anchor="middle">CN10</text>
-            <rect x="54" y="165" width="14" height="135" rx="2" fill="#181a20" stroke="#334155"/>
-            <text x="61" y="158" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#0369a1" text-anchor="middle">PWR</text>
-            <rect x="54" y="310" width="14" height="105" rx="2" fill="#181a20" stroke="#334155"/>
-            <text x="61" y="305" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#0369a1" text-anchor="middle">ANALOG</text>
-            <rect x="312" y="150" width="14" height="158" rx="2" fill="#181a20" stroke="#334155"/>
-            <text x="319" y="144" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#0369a1" text-anchor="middle">DIGITAL</text>
-            <rect x="312" y="317" width="14" height="128" rx="2" fill="#181a20" stroke="#334155"/>
+
+            <!-- CN7 & CN10 Morpho Header Housings -->
+            <rect x="39" y="150" width="28" height="295" rx="2" fill="#181a20" stroke="#334155"/>
+            <text x="53" y="145" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#64748b" text-anchor="middle">CN7</text>
+            <rect x="373" y="150" width="28" height="295" rx="2" fill="#181a20" stroke="#334155"/>
+            <text x="387" y="145" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#64748b" text-anchor="middle">CN10</text>
+
+            <!-- Arduino CN6, CN8, CN5, CN9 Header Housings -->
+            <rect x="89" y="165" width="14" height="135" rx="2" fill="#181a20" stroke="#334155"/>
+            <text x="96" y="158" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#0369a1" text-anchor="middle">CN6</text>
+            <rect x="89" y="310" width="14" height="105" rx="2" fill="#181a20" stroke="#334155"/>
+            <text x="96" y="305" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#0369a1" text-anchor="middle">CN8</text>
+            <rect x="337" y="150" width="14" height="158" rx="2" fill="#181a20" stroke="#334155"/>
+            <text x="344" y="144" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#0369a1" text-anchor="middle">CN5</text>
+            <rect x="337" y="317" width="14" height="128" rx="2" fill="#181a20" stroke="#334155"/>
+            <text x="344" y="456" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#0369a1" text-anchor="middle">CN9</text>
+
             ${pins.map(p => `
               <rect x="${p.x - 4.5}" y="${p.y - 4.5}" width="9" height="9" fill="#ca8a04" stroke="#000000" stroke-width="0.8" rx="1"/>
               <rect x="${p.x - 2}" y="${p.y - 2}" width="4" height="4" fill="#000000" rx="0.5"/>
             `).join('')}
-            ${leftPwr.map((lbl, i) => `<text x="74" y="${175 + i * 16}" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="bold" fill="#0f172a" dominant-baseline="central">${lbl}</text>`).join('')}
-            ${leftAnalog.map((lbl, i) => `<text x="74" y="${320 + i * 16}" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="bold" fill="#0f172a" dominant-baseline="central">${lbl}</text>`).join('')}
-            ${rightDigHigh.map((lbl, i) => `<text x="306" y="${160 + i * 15}" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="bold" fill="#0f172a" text-anchor="end" dominant-baseline="central">${lbl}</text>`).join('')}
-            ${rightDigLow.map((lbl, i) => `<text x="306" y="${325 + i * 15}" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="bold" fill="#0f172a" text-anchor="end" dominant-baseline="central">${lbl}</text>`).join('')}
+
+            <!-- Outer CN7 Labels -->
+            ${cn7Left.map((lbl, i) => `<text x="35" y="${160 + i * 15}" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#1e3a8a" text-anchor="end" dominant-baseline="central">${lbl}</text>`).join('')}
+            <!-- Outer CN10 Labels -->
+            ${cn10Right.map((lbl, i) => `<text x="405" y="${160 + i * 15}" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="bold" fill="#1e3a8a" dominant-baseline="central">${lbl}</text>`).join('')}
+
+            <!-- Inner Arduino CN6 & CN8 Labels -->
+            ${leftPwr.map((lbl, i) => `<text x="108" y="${175 + i * 16}" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="bold" fill="#9d174d" dominant-baseline="central">${lbl}</text>`).join('')}
+            ${leftAnalog.map((lbl, i) => `<text x="108" y="${320 + i * 16}" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="bold" fill="#9d174d" dominant-baseline="central">${lbl}</text>`).join('')}
+
+            <!-- Inner Arduino CN5 & CN9 Labels -->
+            ${rightDigHigh.map((lbl, i) => `<text x="332" y="${160 + i * 15}" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="bold" fill="#9d174d" text-anchor="end" dominant-baseline="central">${lbl}</text>`).join('')}
+            ${rightDigLow.map((lbl, i) => `<text x="332" y="${325 + i * 15}" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="bold" fill="#9d174d" text-anchor="end" dominant-baseline="central">${lbl}</text>`).join('')}
           </g>
         `
       };
@@ -554,18 +583,18 @@
         name: 'STM32 Blue Pill',
         category: 'mcu',
         partNumber: 'STM32F103C8T6',
-        desc: '72MHz ARM Cortex-M3 microcontroller with 40 header pins, boot jumpers, and clear silkscreen.',
+        desc: '72MHz ARM Cortex-M3 microcontroller with 40 header pins matching authentic Blue Pill silkscreen.',
         width: 180,
         height: 380,
         pins: (() => {
           const p = [];
-          const leftLabels = ["VB", "C13", "C14", "C15", "A0", "A1", "A2", "A3", "A4", "A5", "~A6", "~A7", "~B0", "~B1", "B10", "B11", "R", "3.3", "G", "5V"];
+          const leftLabels = ["VB", "C13", "C14", "C15", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "B0", "B1", "B10", "B11", "R", "3.3", "G", "G"];
           leftLabels.forEach((name, i) => {
-            p.push({ id: `bp_l_${i}`, name, label: name, type: name.includes("G") ? "GND" : (name.includes("V") || name==="3.3" || name==="VB" ? "PWR" : "GPIO"), x: 16, y: 35 + i * 17, side: 'left' });
+            p.push({ id: `bp_l_${i}`, name, label: name, type: name === "G" ? "GND" : (name === "3.3" || name === "VB" ? "PWR" : "GPIO"), x: 16, y: 35 + i * 17, side: 'left' });
           });
-          const rightLabels = ["G", "G", "3.3", "B12", "B13", "B14", "B15", "~A8", "A9", "A10", "~A11", "A12", "A15", "B3", "B4", "B5", "~B6", "~B7", "~B8", "~B9"];
+          const rightLabels = ["B12", "B13", "B14", "B15", "A8", "A9", "A10", "A11", "A12", "A15", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "5V", "G", "3.3"];
           rightLabels.forEach((name, i) => {
-            p.push({ id: `bp_r_${i}`, name, label: name, type: name.includes("G") ? "GND" : (name.includes("3.3") ? "PWR" : "GPIO"), x: 164, y: 35 + i * 17, side: 'right' });
+            p.push({ id: `bp_r_${i}`, name, label: name, type: name === "G" ? "GND" : (name === "3.3" || name === "5V" ? "PWR" : "GPIO"), x: 164, y: 35 + i * 17, side: 'right' });
           });
           return p;
         })(),
@@ -593,8 +622,8 @@
               <text x="17" y="22" font-family="'JetBrains Mono', monospace" font-size="6.5" fill="#cbd5e1" text-anchor="middle">SWD</text>
             </g>
             ${(() => {
-              const leftLabels = ["VB", "C13", "C14", "C15", "A0", "A1", "A2", "A3", "A4", "A5", "~A6", "~A7", "~B0", "~B1", "B10", "B11", "R", "3.3", "G", "5V"];
-              const rightLabels = ["G", "G", "3.3", "B12", "B13", "B14", "B15", "~A8", "A9", "A10", "~A11", "A12", "A15", "B3", "B4", "B5", "~B6", "~B7", "~B8", "~B9"];
+              const leftLabels = ["VB", "C13", "C14", "C15", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "B0", "B1", "B10", "B11", "R", "3.3", "G", "G"];
+              const rightLabels = ["B12", "B13", "B14", "B15", "A8", "A9", "A10", "A11", "A12", "A15", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "5V", "G", "3.3"];
               let s = '';
               leftLabels.forEach((lbl, i) => {
                 s += `<text x="28" y="${39 + i * 17}" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc">${lbl}</text>`;
@@ -620,18 +649,36 @@
         name: 'Wemos D1 Mini (ESP8266)',
         category: 'mcu',
         partNumber: 'ESP8266 / D1 Mini',
-        desc: 'Compact Wi-Fi IoT development board with labeled GPIO pinouts and ESP8266 module.',
+        desc: 'Compact Wi-Fi IoT development board with authentic Wemos D1 Mini silkscreen pinout.',
         width: 170,
         height: 220,
         pins: (() => {
           const p = [];
-          const left = ["RST", "A0", "D0", "D5", "D6", "D7", "D8", "3V3"];
-          left.forEach((name, i) => {
-            p.push({ id: `wm_l_${i}`, name, label: name, type: name === '3V3' ? 'PWR' : 'GPIO', x: 16, y: 34 + i * 21, side: 'left' });
+          const left = [
+            { lbl: "RST", full: "RST" },
+            { lbl: "A0", full: "A0 (ADC0)" },
+            { lbl: "D0", full: "D0 (GPIO16)" },
+            { lbl: "D5", full: "D5 (GPIO14/SCK)" },
+            { lbl: "D6", full: "D6 (GPIO12/MISO)" },
+            { lbl: "D7", full: "D7 (GPIO13/MOSI)" },
+            { lbl: "D8", full: "D8 (GPIO15/CS)" },
+            { lbl: "3V3", full: "3V3" }
+          ];
+          left.forEach((item, i) => {
+            p.push({ id: `wm_l_${i}`, name: item.full, label: item.lbl, type: item.lbl === '3V3' ? 'PWR' : 'GPIO', x: 16, y: 34 + i * 21, side: 'left' });
           });
-          const right = ["TX", "RX", "D1", "D2", "D3", "D4", "GND", "5V"];
-          right.forEach((name, i) => {
-            p.push({ id: `wm_r_${i}`, name, label: name, type: name === 'GND' ? 'GND' : (name === '5V' ? 'PWR' : 'GPIO'), x: 154, y: 34 + i * 21, side: 'right' });
+          const right = [
+            { lbl: "TX", full: "TX (GPIO1)" },
+            { lbl: "RX", full: "RX (GPIO3)" },
+            { lbl: "D1", full: "D1 (GPIO5/SCL)" },
+            { lbl: "D2", full: "D2 (GPIO4/SDA)" },
+            { lbl: "D3", full: "D3 (GPIO0)" },
+            { lbl: "D4", full: "D4 (GPIO2)" },
+            { lbl: "G", full: "G (GND)" },
+            { lbl: "5V", full: "5V" }
+          ];
+          right.forEach((item, i) => {
+            p.push({ id: `wm_r_${i}`, name: item.full, label: item.lbl, type: item.lbl === 'G' ? 'GND' : (item.lbl === '5V' ? 'PWR' : 'GPIO'), x: 154, y: 34 + i * 21, side: 'right' });
           });
           return p;
         })(),
@@ -650,7 +697,7 @@
             <text x="85" y="180" font-family="'JetBrains Mono', monospace" font-size="7" fill="#93c5fd" text-anchor="middle">ESP8266</text>
             ${(() => {
               const left = ["RST", "A0", "D0", "D5", "D6", "D7", "D8", "3V3"];
-              const right = ["TX", "RX", "D1", "D2", "D3", "D4", "GND", "5V"];
+              const right = ["TX", "RX", "D1", "D2", "D3", "D4", "G", "5V"];
               let s = '';
               left.forEach((lbl, i) => {
                 s += `<text x="26" y="${38 + i * 21}" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="bold" fill="#f8fafc">${lbl}</text>`;
