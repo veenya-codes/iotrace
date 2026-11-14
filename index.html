@@ -1936,26 +1936,43 @@
       const hiddenPins = getConnectedPinSetForComponent(comp.id);
       let svgHTML = cat.renderSVG(comp, hiddenPins);
 
-      // Strip matching text elements for connected pins on boards that render labels in loops
       if (hiddenPins.size > 0) {
         const parser = new DOMParser();
-        const doc = parser.parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${svgHTML}</svg>`, 'image/svg+xml');
+        const doc = parser.parseFromString(`<svg xmlns="http://w3.org">${svgHTML}</svg>`, 'image/svg+xml');
+        const allTexts = Array.from(doc.querySelectorAll('text'));
+
         hiddenPins.forEach(pinId => {
           const pinObj = cat.pins.find(p => p.id === pinId);
           if (!pinObj) return;
-          doc.querySelectorAll('text').forEach(t => {
+
+          // Find only the single closest matching text label within 35px of this specific pin
+          let closestText = null;
+          let minDist = 35;
+
+          allTexts.forEach(t => {
+            if (!t.parentNode) return;
             const txt = t.textContent.trim();
             if (txt === pinObj.label || txt === pinObj.name || txt.endsWith(`: ${pinObj.label}`)) {
-              t.remove();
+              const tx = parseFloat(t.getAttribute('x') || '0');
+              const ty = parseFloat(t.getAttribute('y') || '0');
+              const dist = Math.hypot(tx - pinObj.x, ty - pinObj.y);
+              if (dist < minDist) {
+                minDist = dist;
+                closestText = t;
+              }
             }
           });
+
+          if (closestText) {
+            closestText.remove();
+          }
         });
+
         svgHTML = doc.documentElement.innerHTML;
       }
 
       el.querySelector('svg').innerHTML = svgHTML;
     }
-
 
     function renderWires() {
       wiresGroup.innerHTML = '';
