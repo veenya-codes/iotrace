@@ -3001,9 +3001,11 @@
         if (!cat) return;
         const hiddenPins = getConnectedPinSetForComponent(c.id);
         
-        // Grab the already-rendered valid SVG directly from the live DOM element
+        // Serialize the live SVG element using strict XMLSerializer so boards render in PNG
         const liveSvgEl = document.querySelector(`#part-${c.id} svg`);
-        let compSvg = liveSvgEl ? liveSvgEl.innerHTML : cat.renderSVG(c, hiddenPins);
+        let compSvg = liveSvgEl
+          ? new XMLSerializer().serializeToString(liveSvgEl)
+          : cat.renderSVG(c, hiddenPins);
 
         svgContent += `
           <g transform="translate(${c.x}, ${c.y}) rotate(${c.rotation || 0}, ${cat.width / 2}, ${cat.height / 2})">
