@@ -806,17 +806,17 @@
         pins: (() => {
           const p = [];
           const leftSignals = [
-            "P1.0 (T2)", "P1.1 (T2EX)", "P1.2", "P1.3", "P1.4", "P1.5 (MOSI)", "P1.6 (MISO)", "P1.7 (SCK)",
-            "RST", "P3.0 (RXD)", "P3.1 (TXD)", "P3.2 (INT0)", "P3.3 (INT1)", "P3.4 (T0)", "P3.5 (T1)",
-            "P3.6 (WR)", "P3.7 (RD)", "XTAL2", "XTAL1", "GND"
+            "P1.0  ", "P1.1   ", "P1.2  ", "P1.3  ", "P1.4  ", "P1.5  ", "P1.6  ", "P1.7  ",
+            "RST  ", "P3.0   ", "P3.1  ", "P3.2  ", "P3.3  ", "P3.4   ", "P3.5  ",
+            "P3.6  ", "P3.7  ", "XTAL2  ", "XTAL1  ", "GND  "
           ];
           leftSignals.forEach((sig, i) => {
             p.push({ id: `at_p_${i+1}`, name: `Pin ${i+1}: ${sig}`, label: `${i+1}: ${sig}`, type: sig === 'GND' ? 'GND' : 'GPIO', x: 12, y: 35 + i * 20, side: 'left' });
           });
 
           const rightSignals = [
-            "VCC", "P0.0 (AD0)", "P0.1 (AD1)", "P0.2 (AD2)", "P0.3 (AD3)", "P0.4 (AD4)", "P0.5 (AD5)", "P0.6 (AD6)", "P0.7 (AD7)",
-            "EA/VPP", "ALE/PROG", "PSEN", "P2.7 (A15)", "P2.6 (A14)", "P2.5 (A13)", "P2.4 (A12)", "P2.3 (A11)", "P2.2 (A10)", "P2.1 (A9)", "P2.0 (A8)"
+            "VCC  ", "P0.0  ", "P0.1  ", "P0.2  ", "P0.3  ", "P0.4  ", "P0.5  ", "P0.6  ", "P0.7  ",
+            "EA/VPP  ", "ALE/PROG  ", "PSEN  ", "P2.7  ", "P2.6  ", "P2.5  ", "P2.4  ", "P2.3  ", "P2.2  ", "P2.1  ", "P2.0  "
           ];
           rightSignals.forEach((sig, i) => {
             p.push({ id: `at_p_${40-i}`, name: `Pin ${40-i}: ${sig}`, label: `${40-i}: ${sig}`, type: sig === 'VCC' ? 'PWR' : 'GPIO', x: 198, y: 35 + i * 20, side: 'right' });
