@@ -1,6 +1,6 @@
 # ⚡ IoTrace — IoT Circuit & Wiring CAD Workbench
 
-🌐 **Live Web App:** [https://vercel.app](https://vercel.app)
+🌐 **Live Web App:** [https://iot.vercel.app](https://iotrace.vercel.app/)
 
 **IoTrace** is a browser-based visual circuit diagram and hardware wiring workbench built for IoT engineers, embedded developers, and students. It replaces messy hobbyist wiring with clean, **90° Manhattan orthogonal routing**, dynamic floating pin labels, and high-resolution schematic exports—all running in a single, zero-dependency HTML5 file.
 
@@ -63,7 +63,7 @@
 
 ## 🚀 Getting Started
 
-* **Use Online:** Open [https://vercel.app](https://vercel.app) directly in your browser.
+* **Use Online:** Open [https://iotvercel.app](https://iotrace.vercel.app/) directly in your browser.
 * **Run Locally:** Clone this repository and open `index.html` in any modern web browser—no build tools, Node.js, or servers required.
 
 ---
