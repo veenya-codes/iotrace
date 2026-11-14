@@ -1,12 +1,12 @@
-# ⚡ IoTrace — IoT Circuit & Wiring CAD Workbench
+#  IoTrace — IoT Circuit & Wiring CAD Workbench
 
-🌐 **Live Web App:** [https://iot.vercel.app](https://iotrace.vercel.app/)
+**Live Web App:** [https://iot.vercel.app](https://iotrace.vercel.app/)
 
 **IoTrace** is a browser-based visual circuit diagram and hardware wiring workbench built for IoT engineers, embedded developers, and students. It replaces messy hobbyist wiring with clean, **90° Manhattan orthogonal routing**, dynamic floating pin labels, and high-resolution schematic exports—all running in a single, zero-dependency HTML5 file.
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
 * **Infinite Pan & Zoom Canvas:** Smooth mouse-wheel zooming and middle/left-click panning over a 20px snap-to-grid coordinate matrix.
 * **90° Orthogonal Wiring Engine:**
@@ -23,7 +23,7 @@
 
 ---
 
-## 📦 Included Hardware Library
+## Included Hardware Library
 
 * **Microcontrollers:**
   * STM32 Blue Pill (`STM32F103C8T6`)
@@ -46,7 +46,7 @@
 
 ---
 
-## ⌨️ Keyboard Shortcuts
+## Keyboard Shortcuts
 
 | Shortcut | Action |
 | :--- | :--- |
@@ -61,19 +61,19 @@
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-* **Use Online:** Open [https://iotvercel.app](https://iotrace.vercel.app/) directly in your browser.
+* **Use Online:** Open [https://iotrace.vercel.app](https://iotrace.vercel.app/) directly in your browser.
 * **Run Locally:** Clone this repository and open `index.html` in any modern web browser—no build tools, Node.js, or servers required.
 
 ---
 
-## 🛠️ Built With
+## Built With
 
 * **HTML5 & Vanilla JavaScript** (Custom SVG Coordinate Matrix & Orthogonal Router)
 * **Tailwind CSS** (CDN)
 * **Lucide Icons** & **JetBrains Mono / Inter** Typography
 
-## 📄 License
+## License
 
 Open-source under the [MIT License](LICENSE).
